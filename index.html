@@ -114,8 +114,21 @@
       .contact-field.full { grid-column:span 2; }
       .contact-field label { color:#d9b781; font:10px/1.2 "DM Mono",monospace; letter-spacing:.09em; text-transform:uppercase; }
       .contact-field input { width:100%; min-height:51px; color:white; border:0; border-bottom:1px solid rgba(255,255,255,.45); border-radius:0; padding:8px 0; outline:0; background:transparent; font:15px Manrope,sans-serif; }
+      .contact-field textarea { width:100%; min-height:106px; resize:vertical; color:white; border:0; border-bottom:1px solid rgba(255,255,255,.45); border-radius:0; padding:10px 0; outline:0; background:transparent; font:15px/1.5 Manrope,sans-serif; }
       .contact-field input:focus { border-color:#e7c992; }
+      .contact-field textarea:focus { border-color:#e7c992; }
       .contact-field input::placeholder { color:rgba(255,255,255,.36); }
+      .contact-field textarea::placeholder { color:rgba(255,255,255,.36); }
+      .guest-range { display:grid; grid-template-columns:1fr auto; align-items:center; gap:16px; padding-top:3px; }
+      .guest-range input { appearance:none; min-height:20px; padding:0; border:0; background:transparent; }
+      .guest-range input::-webkit-slider-runnable-track { height:3px; background:#d9b781; }
+      .guest-range input::-webkit-slider-thumb { appearance:none; width:17px; height:17px; margin-top:-7px; border-radius:50%; background:#fff; border:2px solid var(--terracotta); }
+      .guest-range output { min-width:36px; color:#f2d39d; font:500 29px/1 "Playfair Display",serif; text-align:right; }
+      .guest-types { grid-column:span 2; display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-top:5px; }
+      .guest-types input { min-height:44px; }
+      .system-message { grid-column:span 2; display:none; margin:0; color:#f09b86; font:600 11px/1.5 Manrope,sans-serif; letter-spacing:.02em; }
+      .system-message.visible { display:block; }
+      .honeypot { position:absolute; left:-10000px; width:1px; height:1px; overflow:hidden; }
       .contact-submit { grid-column:span 2; display:flex; align-items:center; justify-content:space-between; gap:20px; margin-top:15px; }
       .contact-submit small { color:rgba(255,255,255,.55); max-width:380px; text-align:left; font-size:11px; line-height:1.5; }
       .contact-submit .button { border:0; cursor:pointer; white-space:nowrap; }
@@ -128,7 +141,7 @@
         .about,.signature,.location,.quote,.book,.airbnb-proof,.contact { padding-left:20px; padding-right:20px; } .about { padding-top:78px; padding-bottom:75px; } .about-grid,.signature-grid,.proof-inner { grid-template-columns:1fr; gap:35px; }
         .gallery { padding:0 20px 75px; grid-template-columns:1fr; grid-template-rows:320px 190px 190px; } .gallery figure:first-child { grid-row:auto; }
         .signature { padding-top:75px; padding-bottom:75px; } .features { grid-template-columns:1fr; } .feature:nth-child(odd),.feature:nth-child(even) { border-right:0; padding-left:0; padding-right:0; }
-        .location { min-height:520px; } footer { padding:22px 20px; flex-direction:column; } .book-cta { margin-bottom:72px; } .airbnb-proof,.contact { padding-top:75px; padding-bottom:75px; } .contact-form { grid-template-columns:1fr; } .contact-field.full,.contact-submit { grid-column:span 1; } .contact-submit { align-items:stretch; flex-direction:column; } .contact-submit .button { width:100%; }
+        .location { min-height:520px; } footer { padding:22px 20px; flex-direction:column; } .book-cta { margin-bottom:72px; } .airbnb-proof,.contact { padding-top:75px; padding-bottom:75px; } .contact-form { grid-template-columns:1fr; } .contact-field.full,.contact-submit,.guest-types,.system-message { grid-column:span 1; } .guest-types { grid-template-columns:1fr; gap:10px; } .contact-submit { align-items:stretch; flex-direction:column; } .contact-submit .button { width:100%; }
       }
     </style>
   </head>
@@ -162,8 +175,8 @@
 
         <section class="gallery" aria-label="Galleria fotografica">
           <figure><img src="https://a0.muscache.com/im/pictures/c47de425-9065-4d93-b7e4-da38473ef60c.jpg?im_w=1440" alt="La piscina privata illuminata di sera" data-i18n-alt="poolAlt" /><figcaption data-i18n="summerNights">Notti d'estate</figcaption></figure>
-          <figure><img src="https://a0.muscache.com/im/pictures/8d062a68-592f-41b0-afee-4159af307663.jpg?im_w=1000" alt="Vista dall'alto della villa e della piscina" data-i18n-alt="aerialAlt" /><figcaption>Playa Grande</figcaption></figure>
-          <figure><img src="https://a0.muscache.com/im/pictures/79355790/2778cad1_original.jpg?im_w=1000" alt="Dettaglio della piscina della villa" data-i18n-alt="poolDetailAlt" /><figcaption data-i18n="waterLight">Acqua, luce, quiete</figcaption></figure>
+          <figure><img src="https://a0.muscache.com/im/pictures/8d062a68-592f-41b0-afee-4159af307663.jpg?im_w=720" alt="Vista dall'alto della villa e della piscina" data-i18n-alt="aerialAlt" /><figcaption>Playa Grande</figcaption></figure>
+          <figure><img src="https://a0.muscache.com/im/pictures/79355790/2778cad1_original.jpg?im_w=720" alt="Dettaglio della piscina della villa" data-i18n-alt="poolDetailAlt" /><figcaption data-i18n="waterLight">Acqua, luce, quiete</figcaption></figure>
         </section>
 
         <section class="signature" id="esperienza">
@@ -185,11 +198,12 @@
         <section class="book" id="prenota"><div class="eyebrow" data-i18n="yourSummer">La vostra estate</div><h2 data-i18n-html="bookTitle">Scegli come<br><em>prenotare.</em></h2><p data-i18n="bookText">Per una risposta personalizzata e per verificare la disponibilità, scrivici direttamente su WhatsApp. Se preferisci, puoi anche prenotare tramite Airbnb.</p><div class="book-cta"><a class="button" href="#info"><span data-contact="bookPrimary">Richiedi disponibilità su WhatsApp</span> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a><a class="link-arrow" href="https://www.airbnb.it/rooms/6303698" target="_blank" rel="noopener" data-contact="bookAirbnb">Oppure prenota su Airbnb</a></div></section>
 
         <section class="contact" id="info"><div class="contact-inner"><div class="contact-head"><div class="eyebrow" data-contact="contactEyebrow">Contatto diretto</div><h2 data-contact-html="contactTitle">Chiedi informazioni<br><em>su WhatsApp.</em></h2><p data-contact="contactText">Raccontaci il soggiorno che immagini: ti risponderemo al più presto.</p></div>
-          <form class="contact-form" id="whatsapp-form"><div class="contact-field full"><label for="guest-name" data-contact="nameLabel">Nome e cognome</label><input id="guest-name" name="name" type="text" autocomplete="name" required data-contact-placeholder="namePlaceholder" placeholder="Es. Giulia Bianchi" /></div><div class="contact-field"><label for="guest-phone" data-contact="phoneLabel">Numero di telefono</label><input id="guest-phone" name="phone" type="tel" autocomplete="tel" required data-contact-placeholder="phonePlaceholder" placeholder="Es. +39 333 123 4567" /></div><div class="contact-field"><label for="guest-email" data-contact="emailLabel">Email</label><input id="guest-email" name="email" type="email" autocomplete="email" required data-contact-placeholder="emailPlaceholder" placeholder="Es. giulia@email.com" /></div><div class="contact-field"><label for="check-in" data-contact="checkinLabel">Check-in</label><input id="check-in" name="checkin" type="date" required /></div><div class="contact-field"><label for="check-out" data-contact="checkoutLabel">Check-out</label><input id="check-out" name="checkout" type="date" required /></div><div class="contact-field full"><label for="guests" data-contact="peopleLabel">Numero di persone</label><input id="guests" name="guests" type="number" min="1" max="9" required data-contact-placeholder="peoplePlaceholder" placeholder="Fino a 9 ospiti" /></div><div class="contact-submit"><small data-contact="privacyNote">Aprendo WhatsApp, i dati inseriti verranno usati solo per comporre la tua richiesta.</small><button class="button" type="submit"><span data-contact="whatsappButton">Invia su WhatsApp</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div></form>
+          <form class="contact-form" id="whatsapp-form" novalidate><div class="contact-field"><label for="guest-first-name" data-form="firstNameLabel">Nome</label><input id="guest-first-name" name="firstName" type="text" autocomplete="given-name" required data-form-placeholder="firstNamePlaceholder" placeholder="Es. Giulia" /></div><div class="contact-field"><label for="guest-last-name" data-form="lastNameLabel">Cognome</label><input id="guest-last-name" name="lastName" type="text" autocomplete="family-name" required data-form-placeholder="lastNamePlaceholder" placeholder="Es. Bianchi" /></div><div class="contact-field"><label for="guest-phone" data-contact="phoneLabel">Numero di telefono</label><input id="guest-phone" name="phone" type="tel" autocomplete="tel" required data-contact-placeholder="phonePlaceholder" placeholder="Es. +39 333 123 4567" /></div><div class="contact-field"><label for="guest-email" data-contact="emailLabel">Email</label><input id="guest-email" name="email" type="email" autocomplete="email" required data-contact-placeholder="emailPlaceholder" placeholder="Es. giulia@email.com" /></div><div class="contact-field"><label for="check-in" data-contact="checkinLabel">Check-in</label><input id="check-in" name="checkin" type="date" required /></div><div class="contact-field"><label for="check-out" data-contact="checkoutLabel">Check-out</label><input id="check-out" name="checkout" type="date" required /></div><p class="system-message" id="stay-warning" role="status" data-form="longStayWarning">È stato selezionato un periodo superiore a 3 settimane.</p><p class="system-message" id="date-error" role="alert"></p><div class="contact-field full"><label for="people-total" data-form="peopleTotalLabel">Numero totale di persone</label><div class="guest-range"><input id="people-total" name="guests" type="range" min="1" max="9" step="1" value="1" aria-describedby="people-total-value" /><output id="people-total-value" for="people-total">1</output></div></div><div class="guest-types"><div class="contact-field"><label for="adults" data-form="adultsLabel">Adulti (13+)</label><input id="adults" name="adults" type="number" min="1" max="9" step="1" value="1" required /></div><div class="contact-field"><label for="children" data-form="childrenLabel">Bambini (2–12)</label><input id="children" name="children" type="number" min="0" max="9" step="1" value="0" required /></div><div class="contact-field"><label for="infants" data-form="infantsLabel">Neonati (0–2)</label><input id="infants" name="infants" type="number" min="0" max="9" step="1" value="0" required /></div></div><p class="system-message" id="guest-error" role="alert"></p><div class="contact-field full"><label for="guest-message" data-form="messageLabel">Messaggio</label><textarea id="guest-message" name="message" maxlength="1000" data-form-placeholder="messagePlaceholder" placeholder="Raccontaci le tue esigenze o eventuali richieste speciali."></textarea></div><div class="honeypot" aria-hidden="true"><label for="website">Website</label><input id="website" name="website" type="text" tabindex="-1" autocomplete="off" /></div><input type="hidden" id="form-language" name="language" value="it" /><div class="contact-submit"><small data-contact="privacyNote">Aprendo WhatsApp, i dati inseriti verranno usati solo per comporre la tua richiesta.</small><button class="button" type="submit"><span data-contact="whatsappButton">Invia su WhatsApp</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div></form>
         </div></section>
       </main>
       <footer><span>Villa Stefano · Playa Grande, Sicilia</span><span data-i18n="rights">© 2026 · Tutti i diritti riservati</span></footer>
     </div>
+    <script src="secure-form-config.js"></script>
     <script>
       const translations = {
         it: { navVilla:'La villa',navExperience:"L'esperienza",navLocation:'Dove siamo',navBook:'Prenota',heroPlace:'Playa Grande · Sicilia',heroTitle:'La Sicilia,<em>a modo tuo.</em>',heroIntro:'Un rifugio privato fra il verde mediterraneo e il mare: giorni lenti, serate sotto le stelle e una piscina che sembra non finire mai.',guests:'Ospiti',privatePool:'Piscina privata',fromSea:'Dal mare',scroll:'Scorri per scoprire',aboutEyebrow:'Il rifugio',aboutTitle:'Spazio per<br><em>respirare.</em>',aboutLead:'Villa Stefano è una casa di carattere, pensata per chi cerca il lusso più raro: silenzio, privacy e il tempo di stare insieme.',aboutText:'Nel cuore di Playa Grande, a pochi minuti da Donnalucata, la villa accoglie famiglie e amici con quattro camere, ampi spazi esterni, barbecue e una piscina privata in-ground di 150 m².',availability:'Scopri la disponibilità',poolAlt:'La piscina privata illuminata di sera',aerialAlt:'Vista dall’alto della villa e della piscina',poolDetailAlt:'Dettaglio della piscina della villa',summerNights:"Notti d'estate",waterLight:'Acqua, luce, quiete',experienceEyebrow:"L'esperienza Villa Stefano",experienceTitle:'Qui ogni giornata ha <em>il suo ritmo.</em>',poolTitle:'La piscina',poolText:"150 m² d'acqua privata per iniziare il giorno senza fretta e finirlo sotto il cielo siciliano.",seaTitle:'Il mare vicino',seaText:'La spiaggia è a soli 400 metri: abbastanza vicina per una passeggiata, abbastanza lontana per il silenzio.',tableTitle:'La tavola',tableText:"Cucina attrezzata, barbecue e spazi generosi: il luogo giusto per pranzi lunghi e cene all'aperto.",welcomeTitle:"L'accoglienza",welcomeText:"Self check-in, parcheggio in loco e un'ospitalità siciliana attenta a ogni dettaglio.",coast:'Costa sud-orientale',locationTitle:'Tra il barocco, il blu e il profumo degli agrumi.',locationText:'Donnalucata, Scicli, Modica e i luoghi di Montalbano sono tutti a portata di giornata. Poi si torna qui, dove la Sicilia rallenta.',explore:'Esplora la zona',quote:'Lo spazio esterno è davvero incredibile. Ancora meglio delle foto.',quoteSource:'Ospite verificato · Agosto 2026',yourSummer:'La vostra estate',bookTitle:'Scegli come<br><em>prenotare.</em>',bookText:'Per una risposta personalizzata e per verificare la disponibilità, scrivici direttamente su WhatsApp. Se preferisci, puoi anche prenotare tramite Airbnb.',checkAvailability:'Verifica disponibilità',rights:'© 2026 · Tutti i diritti riservati'},
@@ -203,12 +217,19 @@
         es: { reviewsEyebrow:'Huéspedes de Airbnb',reviewsTitle:'Elegida, querida,<br><em>recordada.</em>',reviewsText:'Una reputación construida con atención, cuidado y el deseo de que cada huésped se sienta como en casa.',ratingLabel:'Valoración Airbnb',reviewsLabel:'Reseñas verificadas',statsFallback:'Datos de Airbnb actualizados a diario',contactEyebrow:'Contacto directo',contactTitle:'Pide información<br><em>por WhatsApp.</em>',contactText:'Cuéntanos la estancia que imaginas: te responderemos lo antes posible.',nameLabel:'Nombre y apellidos',namePlaceholder:'Ej. Julia García',phoneLabel:'Número de teléfono',phonePlaceholder:'Ej. +34 600 123 456',emailLabel:'Correo electrónico',emailPlaceholder:'Ej. julia@email.com',checkinLabel:'Entrada',checkoutLabel:'Salida',peopleLabel:'Número de personas',peoplePlaceholder:'Hasta 9 huéspedes',privacyNote:'Al abrir WhatsApp, los datos introducidos se usarán solo para redactar tu solicitud.',whatsappButton:'Enviar por WhatsApp',heroWhatsApp:'Consultar disponibilidad',heroAirbnb:'Reservar en Airbnb',bookPrimary:'Consultar disponibilidad por WhatsApp',bookAirbnb:'O reserva en Airbnb',bookInfo:'O pide información directamente',updatedPrefix:'Datos de Airbnb actualizados el ' },
         fr: { reviewsEyebrow:'Voyageurs Airbnb',reviewsTitle:'Choisie, aimée,<br><em>inoubliable.</em>',reviewsText:'Une réputation bâtie sur l’attention, le soin et le désir de faire sentir chaque voyageur comme chez lui.',ratingLabel:'Note Airbnb',reviewsLabel:'Avis vérifiés',statsFallback:'Données Airbnb mises à jour chaque jour',contactEyebrow:'Contact direct',contactTitle:'Demandez des informations<br><em>sur WhatsApp.</em>',contactText:'Parlez-nous du séjour que vous imaginez : nous vous répondrons au plus vite.',nameLabel:'Nom et prénom',namePlaceholder:'Ex. Julie Martin',phoneLabel:'Numéro de téléphone',phonePlaceholder:'Ex. +33 6 12 34 56 78',emailLabel:'E-mail',emailPlaceholder:'Ex. julie@email.com',checkinLabel:'Arrivée',checkoutLabel:'Départ',peopleLabel:'Nombre de voyageurs',peoplePlaceholder:'Jusqu’à 9 voyageurs',privacyNote:'En ouvrant WhatsApp, les informations saisies servent uniquement à rédiger votre demande.',whatsappButton:'Envoyer sur WhatsApp',heroWhatsApp:'Voir les disponibilités',heroAirbnb:'Réserver sur Airbnb',bookPrimary:'Voir les disponibilités sur WhatsApp',bookAirbnb:'Ou réserver sur Airbnb',bookInfo:'Ou demandez des informations',updatedPrefix:'Données Airbnb mises à jour le ' }
       };
+      const formTranslations = {
+        it: { firstNameLabel:'Nome',firstNamePlaceholder:'Es. Giulia',lastNameLabel:'Cognome',lastNamePlaceholder:'Es. Bianchi',peopleTotalLabel:'Numero totale di persone',adultsLabel:'Adulti (13+)',childrenLabel:'Bambini (2–12)',infantsLabel:'Neonati (0–2)',messageLabel:'Messaggio',messagePlaceholder:'Raccontaci le tue esigenze o eventuali richieste speciali.',longStayWarning:'È stato selezionato un periodo superiore a 3 settimane.',checkoutAfter:'La data di check-out deve essere successiva al check-in.',maxStay:'Il soggiorno non può superare 30 giorni.',guestTotal:'La somma di adulti, bambini e neonati deve corrispondere al numero totale di persone.',emailInvalid:'Inserisci un indirizzo email valido.' },
+        en: { firstNameLabel:'First name',firstNamePlaceholder:'E.g. Julia',lastNameLabel:'Last name',lastNamePlaceholder:'E.g. Smith',peopleTotalLabel:'Total number of guests',adultsLabel:'Adults (13+)',childrenLabel:'Children (2–12)',infantsLabel:'Infants (0–2)',messageLabel:'Message',messagePlaceholder:'Tell us about your needs or any special requests.',longStayWarning:'A period longer than 3 weeks is selected.',checkoutAfter:'Check-out must be after check-in.',maxStay:'The stay cannot be longer than 30 days.',guestTotal:'Adults, children and infants must add up to the total number of guests.',emailInvalid:'Enter a valid email address.' },
+        es: { firstNameLabel:'Nombre',firstNamePlaceholder:'Ej. Julia',lastNameLabel:'Apellidos',lastNamePlaceholder:'Ej. García',peopleTotalLabel:'Número total de personas',adultsLabel:'Adultos (13+)',childrenLabel:'Niños (2–12)',infantsLabel:'Bebés (0–2)',messageLabel:'Mensaje',messagePlaceholder:'Cuéntanos tus necesidades o cualquier petición especial.',longStayWarning:'Se ha seleccionado un periodo superior a 3 semanas.',checkoutAfter:'La salida debe ser posterior a la entrada.',maxStay:'La estancia no puede superar los 30 días.',guestTotal:'Adultos, niños y bebés deben sumar el número total de personas.',emailInvalid:'Introduce una dirección de correo válida.' },
+        fr: { firstNameLabel:'Prénom',firstNamePlaceholder:'Ex. Julie',lastNameLabel:'Nom',lastNamePlaceholder:'Ex. Martin',peopleTotalLabel:'Nombre total de voyageurs',adultsLabel:'Adultes (13+)',childrenLabel:'Enfants (2–12)',infantsLabel:'Bébés (0–2)',messageLabel:'Message',messagePlaceholder:'Parlez-nous de vos besoins ou de toute demande particulière.',longStayWarning:'Une période de plus de 3 semaines a été sélectionnée.',checkoutAfter:'Le départ doit être postérieur à l’arrivée.',maxStay:'Le séjour ne peut pas dépasser 30 jours.',guestTotal:'Les adultes, enfants et bébés doivent correspondre au nombre total de voyageurs.',emailInvalid:'Saisissez une adresse e-mail valide.' }
+      };
       let activeLanguage = 'it';
       let currentStats = null;
       const picker = document.getElementById('language-picker');
       function setLanguage(language) {
         const dictionary = translations[language] || translations.it;
         const contactDictionary = contactTranslations[language] || contactTranslations.it;
+        const formDictionary = formTranslations[language] || formTranslations.it;
         activeLanguage = language;
         document.documentElement.lang = language;
         document.querySelectorAll('[data-i18n]').forEach((element) => { element.textContent = dictionary[element.dataset.i18n]; });
@@ -217,6 +238,9 @@
         document.querySelectorAll('[data-contact]').forEach((element) => { element.textContent = contactDictionary[element.dataset.contact]; });
         document.querySelectorAll('[data-contact-html]').forEach((element) => { element.innerHTML = contactDictionary[element.dataset.contactHtml]; });
         document.querySelectorAll('[data-contact-placeholder]').forEach((element) => { element.placeholder = contactDictionary[element.dataset.contactPlaceholder]; });
+        document.querySelectorAll('[data-form]').forEach((element) => { element.textContent = formDictionary[element.dataset.form]; });
+        document.querySelectorAll('[data-form-placeholder]').forEach((element) => { element.placeholder = formDictionary[element.dataset.formPlaceholder]; });
+        document.getElementById('form-language').value = language;
         picker.value = language;
         updateStatsNote();
         try { localStorage.setItem('villa-stefano-language', language); } catch (_) {}
@@ -240,14 +264,132 @@
       try { savedLanguage = localStorage.getItem('villa-stefano-language') || 'it'; } catch (_) {}
       setLanguage(savedLanguage);
       picker.addEventListener('change', (event) => setLanguage(event.target.value));
-      document.getElementById('whatsapp-form').addEventListener('submit', (event) => {
+      const contactForm = document.getElementById('whatsapp-form');
+      const secureFormConfig = window.VILLA_STEFANO_SECURE_FORM || {};
+      const checkIn = document.getElementById('check-in');
+      const checkOut = document.getElementById('check-out');
+      const peopleTotal = document.getElementById('people-total');
+      const peopleTotalValue = document.getElementById('people-total-value');
+      const adults = document.getElementById('adults');
+      const children = document.getElementById('children');
+      const infants = document.getElementById('infants');
+      const guestError = document.getElementById('guest-error');
+      const dateError = document.getElementById('date-error');
+      const stayWarning = document.getElementById('stay-warning');
+      const emailField = document.getElementById('guest-email');
+
+      function toIsoDate(date) {
+        return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+      }
+      function fromIsoDate(value) {
+        const [year, month, day] = value.split('-').map(Number);
+        return new Date(year, month - 1, day);
+      }
+      function addDays(date, days) {
+        const result = new Date(date);
+        result.setDate(result.getDate() + days);
+        return result;
+      }
+      function daysBetween(start, end) {
+        return Math.round((fromIsoDate(end) - fromIsoDate(start)) / 86400000);
+      }
+      function setSystemMessage(element, text) {
+        element.textContent = text || '';
+        element.classList.toggle('visible', Boolean(text));
+      }
+      function validateDates() {
+        const dictionary = formTranslations[activeLanguage] || formTranslations.it;
+        if (!checkIn.value || !checkOut.value) return false;
+        const latestCheckout = toIsoDate(addDays(fromIsoDate(checkIn.value), 30));
+        checkOut.min = checkIn.value;
+        checkOut.max = latestCheckout;
+        let error = '';
+        if (checkOut.value <= checkIn.value) error = dictionary.checkoutAfter;
+        else if (checkOut.value > latestCheckout) error = dictionary.maxStay;
+        checkOut.setCustomValidity(error);
+        setSystemMessage(dateError, error);
+        const duration = error ? 0 : daysBetween(checkIn.value, checkOut.value);
+        stayWarning.classList.toggle('visible', duration > 21);
+        return !error;
+      }
+      function validateGuestTypes() {
+        const dictionary = formTranslations[activeLanguage] || formTranslations.it;
+        const total = Number(peopleTotal.value);
+        const selected = Number(adults.value || 0) + Number(children.value || 0) + Number(infants.value || 0);
+        peopleTotalValue.textContent = total;
+        const error = selected === total ? '' : dictionary.guestTotal;
+        adults.setCustomValidity(error);
+        setSystemMessage(guestError, error);
+        return !error;
+      }
+      function validateEmail() {
+        const dictionary = formTranslations[activeLanguage] || formTranslations.it;
+        const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailField.value.trim());
+        emailField.setCustomValidity(emailField.value && !valid ? dictionary.emailInvalid : '');
+        return !emailField.value || valid;
+      }
+      function formatMessageDate(value) {
+        const locale = {it:'it-IT',en:'en-GB',es:'es-ES',fr:'fr-FR'}[activeLanguage] || 'it-IT';
+        const parts = new Intl.DateTimeFormat(locale, { day:'2-digit', month:'long', year:'numeric' }).formatToParts(fromIsoDate(value));
+        const part = (type) => parts.find((item) => item.type === type)?.value || '';
+        return `${part('day')}-${part('month').toLowerCase()}-${part('year')}`;
+      }
+      const today = new Date();
+      checkIn.min = toIsoDate(today);
+      checkIn.value = toIsoDate(today);
+      checkOut.value = toIsoDate(addDays(today, 1));
+      validateDates();
+      peopleTotalValue.textContent = peopleTotal.value;
+      checkIn.addEventListener('change', () => {
+        if (!checkOut.value || checkOut.value <= checkIn.value) checkOut.value = toIsoDate(addDays(fromIsoDate(checkIn.value), 1));
+        validateDates();
+      });
+      checkOut.addEventListener('change', validateDates);
+      peopleTotal.addEventListener('input', () => {
+        const availableForAdults = Number(peopleTotal.value) - Number(children.value || 0) - Number(infants.value || 0);
+        if (availableForAdults >= 1) adults.value = availableForAdults;
+        validateGuestTypes();
+      });
+      [adults, children, infants].forEach((field) => field.addEventListener('input', () => {
+        const selected = Number(adults.value || 0) + Number(children.value || 0) + Number(infants.value || 0);
+        if (selected >= 1 && selected <= 9) peopleTotal.value = selected;
+        validateGuestTypes();
+      }));
+      emailField.addEventListener('input', validateEmail);
+      if (secureFormConfig.endpoint && secureFormConfig.turnstileSiteKey) {
+        const widget = document.createElement('div');
+        widget.className = 'cf-turnstile';
+        widget.dataset.sitekey = secureFormConfig.turnstileSiteKey;
+        widget.dataset.theme = 'dark';
+        widget.dataset.action = 'villa-stefano-contact';
+        contactForm.querySelector('.contact-submit').before(widget);
+        const turnstileScript = document.createElement('script');
+        turnstileScript.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
+        turnstileScript.async = true;
+        turnstileScript.defer = true;
+        document.head.append(turnstileScript);
+      }
+      contactForm.addEventListener('submit', (event) => {
         event.preventDefault();
-        const form = new FormData(event.currentTarget);
+        const datesValid = validateDates();
+        const guestsValid = validateGuestTypes();
+        const emailValid = validateEmail();
+        if (!datesValid || !guestsValid || !emailValid || !contactForm.checkValidity()) {
+          contactForm.reportValidity();
+          return;
+        }
+        if (secureFormConfig.endpoint && secureFormConfig.turnstileSiteKey) {
+          const token = contactForm.querySelector('[name="cf-turnstile-response"]')?.value;
+          if (!token) return;
+          contactForm.action = secureFormConfig.endpoint;
+          contactForm.method = 'post';
+          HTMLFormElement.prototype.submit.call(contactForm);
+          return;
+        }
+        const form = new FormData(contactForm);
         const value = (name) => form.get(name).toString().trim();
-        const message = activeLanguage === 'it'
-          ? `Nuova richiesta per Villa Stefano%0A%0ANome e cognome: ${value('name')}%0ATelefono: ${value('phone')}%0AEmail: ${value('email')}%0APeriodo: ${value('checkin')} — ${value('checkout')}%0ANumero di persone: ${value('guests')}`
-          : `New enquiry for Villa Stefano%0A%0AFull name: ${value('name')}%0APhone: ${value('phone')}%0AEmail: ${value('email')}%0AStay: ${value('checkin')} — ${value('checkout')}%0ANumber of guests: ${value('guests')}`;
-        window.open(`https://wa.me/4407843936267?text=${encodeURIComponent(message.replace(/%0A/g, '\n'))}`, '_blank', 'noopener');
+        const message = `Nuova richiesta per Villa Stefano\n\nNome: ${value('firstName')}\nCognome: ${value('lastName')}\nTelefono: ${value('phone')}\nEmail: ${value('email')}\nCheck-in: ${formatMessageDate(value('checkin'))}\nCheck-out: ${formatMessageDate(value('checkout'))}\nOspiti: ${value('guests')} (Adulti: ${value('adults')}, Bambini: ${value('children')}, Neonati: ${value('infants')})${value('message') ? `\n\nMessaggio: ${value('message')}` : ''}`;
+        window.open(`https://wa.me/4407843936267?text=${encodeURIComponent(message)}`, '_blank', 'noopener');
       });
     </script>
   </body>
