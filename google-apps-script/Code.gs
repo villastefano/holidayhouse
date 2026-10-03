@@ -7,6 +7,7 @@
  *   ALLOWED_HOSTNAME  villastefano.github.io
  *   AIRBNB_ICAL_URL   Airbnb > Calendar > Availability > Connect calendars > Export (private link, never on the website)
  *   DIRECT_CALENDAR_ID  ID of the Google Calendar holding confirmed direct bookings
+ *   NOTIFY_EMAIL      (optional) where enquiry emails go; defaults to the script owner's address
  *
  * Run setup() once from the editor after setting the properties.
  */
@@ -78,6 +79,7 @@ function doPost(event) {
       ''
     ]);
     cache.put(cacheKey, '1', 90);
+    notifyOwner_(data, translatedMessage);
     // The website opens WhatsApp itself: Apps Script pages cannot redirect the browser.
     return reply_({ ok: true, whatsapp: whatsAppUrl_(data, translatedMessage) });
   } catch (error) {
@@ -120,6 +122,7 @@ function setup() {
   ScriptApp.newTrigger('syncAll').timeBased().everyMinutes(10).create();
   getDirectCalendar_();
   getBookedRanges_(true);
+  MailApp.getRemainingDailyQuota();
   syncAll();
 }
 
@@ -344,8 +347,8 @@ function translateToEnglish_(message, language) {
   return sourceLanguage ? LanguageApp.translate(message, sourceLanguage, 'en') : message;
 }
 
-function whatsAppUrl_(data, translatedMessage) {
-  const text = [
+function enquirySummary_(data, translatedMessage) {
+  return [
     'New enquiry for Villa Stefano',
     '',
     `First name: ${clean_(data.firstName)}`,
@@ -357,7 +360,33 @@ function whatsAppUrl_(data, translatedMessage) {
     `Guests: ${clean_(data.guests)} (Adults: ${clean_(data.adults)}, Children: ${clean_(data.children)}, Infants: ${clean_(data.infants)})`,
     translatedMessage ? `\nMessage: ${translatedMessage}` : ''
   ].filter(Boolean).join('\n');
-  return `https://wa.me/4407843936267?text=${encodeURIComponent(text)}`;
+}
+
+function whatsAppUrl_(data, translatedMessage) {
+  return `https://wa.me/4407843936267?text=${encodeURIComponent(enquirySummary_(data, translatedMessage))}`;
+}
+
+// Email copy of every enquiry, so nothing depends on the guest having WhatsApp.
+// A failure here never blocks the enquiry: it is already in the Sheet.
+function notifyOwner_(data, translatedMessage) {
+  try {
+    const recipient = PropertiesService.getScriptProperties().getProperty('NOTIFY_EMAIL') || Session.getEffectiveUser().getEmail();
+    const original = clean_(data.message);
+    const body = [
+      enquirySummary_(data, translatedMessage),
+      original && original !== translatedMessage ? `\nOriginal message (${clean_(data.language)}): ${original}` : '',
+      `\nSheet: https://docs.google.com/spreadsheets/d/${PropertiesService.getScriptProperties().getProperty('SHEET_ID')}/edit`,
+      'Set Status to Confirmed to block the dates on the website and Airbnb.'
+    ].filter(Boolean).join('\n');
+    MailApp.sendEmail({
+      to: recipient,
+      replyTo: clean_(data.email),
+      subject: `Villa Stefano enquiry: ${clean_(data.firstName)} ${clean_(data.lastName)}, ${formatDateEnglish_(clean_(data.checkin))} - ${formatDateEnglish_(clean_(data.checkout))}`,
+      body: body
+    });
+  } catch (error) {
+    console.error(error);
+  }
 }
 
 function formatDateEnglish_(value) {
