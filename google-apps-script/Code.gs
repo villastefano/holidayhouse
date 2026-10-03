@@ -49,15 +49,13 @@ function doPost(event) {
     if (!verifyTurnstile_(data.turnstile)) throw new Error('Turnstile validation failed.');
     // Re-check against a fresh Airbnb read: the visitor's page may be minutes old.
     // If the feed is down, accept the enquiry; confirmation re-checks before blocking.
-    if (isUnavailable_(clean_(data.checkin), clean_(data.checkout))) {
-      return HtmlService.createHtmlOutput(unavailableMessage_(clean_(data.language)));
-    }
+    if (isUnavailable_(clean_(data.checkin), clean_(data.checkout))) return reply_({ ok: false, error: 'unavailable' });
     const translatedMessage = translateToEnglish_(clean_(data.message), clean_(data.language));
 
     // Avoid accidental double-clicks and basic form flooding.
     const cacheKey = Utilities.base64EncodeWebSafe(`villa-stefano:${data.email.toLowerCase()}`);
     const cache = CacheService.getScriptCache();
-    if (cache.get(cacheKey)) return redirectToWhatsApp_(data, translatedMessage);
+    if (cache.get(cacheKey)) return reply_({ ok: true, whatsapp: whatsAppUrl_(data, translatedMessage) });
 
     const sheet = getOrCreateSheet_();
     sheet.appendRow([
@@ -80,10 +78,11 @@ function doPost(event) {
       ''
     ]);
     cache.put(cacheKey, '1', 90);
-    return redirectToWhatsApp_(data, translatedMessage);
+    // The website opens WhatsApp itself: Apps Script pages cannot redirect the browser.
+    return reply_({ ok: true, whatsapp: whatsAppUrl_(data, translatedMessage) });
   } catch (error) {
     console.error(error);
-    return HtmlService.createHtmlOutput('<p>Unable to send your request. Please return to the website and try again.</p>');
+    return reply_({ ok: false, error: 'failed' });
   }
 }
 
@@ -107,18 +106,47 @@ function getOrCreateSheet_() {
 }
 
 /**
- * Run once from the Apps Script editor: creates the sheet and installs the
- * trigger that blocks/unblocks the direct calendar when Status changes.
+ * Run once from the Apps Script editor (safe to re-run): creates the sheet,
+ * installs the Status edit trigger plus a 10-minute safety-net sync, and
+ * tests both calendars.
  */
 function setup() {
   const sheetId = PropertiesService.getScriptProperties().getProperty('SHEET_ID');
   getOrCreateSheet_();
   ScriptApp.getProjectTriggers()
-    .filter((trigger) => trigger.getHandlerFunction() === 'handleStatusEdit')
+    .filter((trigger) => ['handleStatusEdit', 'syncAll'].includes(trigger.getHandlerFunction()))
     .forEach((trigger) => ScriptApp.deleteTrigger(trigger));
   ScriptApp.newTrigger('handleStatusEdit').forSpreadsheet(sheetId).onEdit().create();
+  ScriptApp.newTrigger('syncAll').timeBased().everyMinutes(10).create();
   getDirectCalendar_();
   getBookedRanges_(true);
+  syncAll();
+}
+
+/** Adds a "Villa Stefano" menu to the Sheet for an on-demand sync. */
+function onOpen() {
+  SpreadsheetApp.getUi().createMenu('Villa Stefano').addItem('Sync confirmed bookings now', 'syncAll').addToUi();
+}
+
+/**
+ * Reconciles every row with the direct calendar. Runs every 10 minutes and
+ * from the menu, so a missed or failed edit trigger catches up on its own.
+ */
+function syncAll() {
+  const lock = LockService.getScriptLock();
+  if (!lock.tryLock(30000)) return;
+  try {
+    const sheet = getOrCreateSheet_();
+    for (let row = 2; row <= sheet.getLastRow(); row++) {
+      try {
+        syncRow_(sheet, row, null);
+      } catch (error) {
+        console.error(`Row ${row}: ${error}`);
+      }
+    }
+  } finally {
+    lock.releaseLock();
+  }
 }
 
 /**
@@ -130,37 +158,45 @@ function handleStatusEdit(event) {
   const sheet = range.getSheet();
   if (sheet.getName() !== SHEET_NAME || range.getRow() < 2 || range.getColumn() > STATUS_COLUMN || range.getLastColumn() < STATUS_COLUMN) return;
 
-  for (let row = range.getRow(); row <= range.getLastRow(); row++) {
-    const values = sheet.getRange(row, 1, 1, EVENT_ID_COLUMN).getValues()[0];
-    const status = String(values[STATUS_COLUMN - 1]).trim();
-    const eventId = String(values[EVENT_ID_COLUMN - 1] || '').trim();
-    const calendar = getDirectCalendar_();
+  const lock = LockService.getScriptLock();
+  if (!lock.tryLock(30000)) return;
+  try {
+    for (let row = range.getRow(); row <= range.getLastRow(); row++) syncRow_(sheet, row, event.source);
+  } finally {
+    lock.releaseLock();
+  }
+}
 
-    if (status === STATUS_CONFIRMED && !eventId) {
-      const checkin = toIsoDate_(values[6]);
-      const checkout = toIsoDate_(values[7]);
-      if (overlapsBooked_(checkin, checkout, getBookedRanges_(true))) {
-        sheet.getRange(row, STATUS_COLUMN).setValue(STATUS_NEW).setNote(`Not confirmed on ${new Date().toLocaleString('en-GB')}: dates already taken on Airbnb or by another direct booking.`);
-        event.source.toast(`Row ${row}: dates unavailable, booking not blocked.`, 'Villa Stefano', 10);
-        continue;
-      }
-      const created = calendar.createAllDayEvent(
-        `Villa Stefano - ${values[2]} ${values[3]} (direct)`,
-        dateFromIso_(checkin),
-        dateFromIso_(checkout),
-        { description: `Phone: ${values[4]}\nEmail: ${values[5]}\nGuests: ${values[8]} (Adults: ${values[9]}, Children: ${values[10]}, Infants: ${values[11]})` }
-      );
-      sheet.getRange(row, EVENT_ID_COLUMN).setValue(created.getId());
-      sheet.getRange(row, STATUS_COLUMN).clearNote();
-      CacheService.getScriptCache().remove(AVAILABILITY_CACHE_KEY);
-      event.source.toast(`Row ${row}: dates blocked. Airbnb will update within a few hours.`, 'Villa Stefano', 10);
-    } else if (status !== STATUS_CONFIRMED && eventId) {
-      const existing = calendar.getEventById(eventId);
-      if (existing) existing.deleteEvent();
-      sheet.getRange(row, EVENT_ID_COLUMN).clearContent();
-      CacheService.getScriptCache().remove(AVAILABILITY_CACHE_KEY);
-      event.source.toast(`Row ${row}: dates released. Airbnb will update within a few hours.`, 'Villa Stefano', 10);
+function syncRow_(sheet, row, spreadsheet) {
+  const notify = (message) => { if (spreadsheet) spreadsheet.toast(message, 'Villa Stefano', 10); };
+  const values = sheet.getRange(row, 1, 1, EVENT_ID_COLUMN).getValues()[0];
+  const status = String(values[STATUS_COLUMN - 1]).trim();
+  const eventId = String(values[EVENT_ID_COLUMN - 1] || '').trim();
+
+  if (status === STATUS_CONFIRMED && !eventId) {
+    const checkin = toIsoDate_(values[6]);
+    const checkout = toIsoDate_(values[7]);
+    if (overlapsBooked_(checkin, checkout, getBookedRanges_(true))) {
+      sheet.getRange(row, STATUS_COLUMN).setValue(STATUS_NEW).setNote(`Not confirmed on ${new Date().toLocaleString('en-GB')}: dates already taken on Airbnb or by another direct booking.`);
+      notify(`Row ${row}: dates unavailable, booking not blocked.`);
+      return;
     }
+    const created = getDirectCalendar_().createAllDayEvent(
+      `Villa Stefano - ${values[2]} ${values[3]} (direct)`,
+      dateFromIso_(checkin),
+      dateFromIso_(checkout),
+      { description: `Phone: ${values[4]}\nEmail: ${values[5]}\nGuests: ${values[8]} (Adults: ${values[9]}, Children: ${values[10]}, Infants: ${values[11]})` }
+    );
+    sheet.getRange(row, EVENT_ID_COLUMN).setValue(created.getId());
+    sheet.getRange(row, STATUS_COLUMN).clearNote();
+    CacheService.getScriptCache().remove(AVAILABILITY_CACHE_KEY);
+    notify(`Row ${row}: dates blocked. Airbnb will update within a few hours.`);
+  } else if (status !== STATUS_CONFIRMED && eventId) {
+    const existing = getDirectCalendar_().getEventById(eventId);
+    if (existing) existing.deleteEvent();
+    sheet.getRange(row, EVENT_ID_COLUMN).clearContent();
+    CacheService.getScriptCache().remove(AVAILABILITY_CACHE_KEY);
+    notify(`Row ${row}: dates released. Airbnb will update within a few hours.`);
   }
 }
 
@@ -270,16 +306,6 @@ function addDaysIso_(value, days) {
   return toIsoDate_(date);
 }
 
-function unavailableMessage_(language) {
-  const messages = {
-    it: 'Le date selezionate non sono più disponibili. Torna al sito e scegli altre date.',
-    en: 'The selected dates are no longer available. Please return to the website and choose other dates.',
-    es: 'Las fechas seleccionadas ya no están disponibles. Vuelve al sitio y elige otras fechas.',
-    fr: 'Les dates sélectionnées ne sont plus disponibles. Revenez sur le site et choisissez d’autres dates.'
-  };
-  return `<p>${messages[language] || messages.en}</p>`;
-}
-
 function verifyTurnstile_(token) {
   const properties = PropertiesService.getScriptProperties();
   const secret = properties.getProperty('TURNSTILE_SECRET');
@@ -318,7 +344,7 @@ function translateToEnglish_(message, language) {
   return sourceLanguage ? LanguageApp.translate(message, sourceLanguage, 'en') : message;
 }
 
-function redirectToWhatsApp_(data, translatedMessage) {
+function whatsAppUrl_(data, translatedMessage) {
   const text = [
     'New enquiry for Villa Stefano',
     '',
@@ -331,8 +357,7 @@ function redirectToWhatsApp_(data, translatedMessage) {
     `Guests: ${clean_(data.guests)} (Adults: ${clean_(data.adults)}, Children: ${clean_(data.children)}, Infants: ${clean_(data.infants)})`,
     translatedMessage ? `\nMessage: ${translatedMessage}` : ''
   ].filter(Boolean).join('\n');
-  const url = `https://wa.me/4407843936267?text=${encodeURIComponent(text)}`;
-  return HtmlService.createHtmlOutput(`<script>window.top.location.replace(${JSON.stringify(url)});</script><p>Opening WhatsApp…</p>`);
+  return `https://wa.me/4407843936267?text=${encodeURIComponent(text)}`;
 }
 
 function formatDateEnglish_(value) {
