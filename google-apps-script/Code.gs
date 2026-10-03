@@ -11,12 +11,12 @@
  * Run setup() once from the editor after setting the properties.
  */
 
-const SHEET_NAME = 'Richieste';
+const SHEET_NAME = 'Enquiries';
 const STATUS_COLUMN = 15;
 const EVENT_ID_COLUMN = 17;
-const STATUS_NEW = 'Nuova';
-const STATUS_CONFIRMED = 'Confermata';
-const STATUS_CANCELLED = 'Annullata';
+const STATUS_NEW = 'New';
+const STATUS_CONFIRMED = 'Confirmed';
+const STATUS_CANCELLED = 'Cancelled';
 const AVAILABILITY_CACHE_KEY = 'villa-stefano:availability';
 const AVAILABILITY_CACHE_SECONDS = 600;
 const AVAILABILITY_HORIZON_DAYS = 550;
@@ -76,7 +76,7 @@ function doPost(event) {
       clean_(data.message),
       translatedMessage,
       STATUS_NEW,
-      'Sito web',
+      'Website',
       ''
     ]);
     cache.put(cacheKey, '1', 90);
@@ -96,7 +96,7 @@ function getOrCreateSheet_() {
   if (!sheet) sheet = spreadsheet.insertSheet(SHEET_NAME);
 
   if (sheet.getLastRow() === 0) {
-    sheet.appendRow(['Data richiesta', 'Lingua', 'Nome', 'Cognome', 'Telefono', 'Email', 'Check-in', 'Check-out', 'Ospiti totali', 'Adulti', 'Bambini', 'Neonati', 'Messaggio originale', 'Messaggio tradotto in italiano', 'Stato', 'Fonte', 'ID evento calendario']);
+    sheet.appendRow(['Enquiry date', 'Language', 'First name', 'Last name', 'Phone', 'Email', 'Check-in', 'Check-out', 'Total guests', 'Adults', 'Children', 'Infants', 'Original message', 'Message (Italian translation)', 'Status', 'Source', 'Calendar event ID']);
     sheet.setFrozenRows(1);
     const statusRule = SpreadsheetApp.newDataValidation()
       .requireValueInList([STATUS_NEW, STATUS_CONFIRMED, STATUS_CANCELLED], true)
@@ -108,7 +108,7 @@ function getOrCreateSheet_() {
 
 /**
  * Run once from the Apps Script editor: creates the sheet and installs the
- * trigger that blocks/unblocks the direct calendar when Stato changes.
+ * trigger that blocks/unblocks the direct calendar when Status changes.
  */
 function setup() {
   const sheetId = PropertiesService.getScriptProperties().getProperty('SHEET_ID');
@@ -122,7 +122,7 @@ function setup() {
 }
 
 /**
- * Installable onEdit trigger. 'Confermata' creates an all-day event in the
+ * Installable onEdit trigger. 'Confirmed' creates an all-day event in the
  * direct calendar (which Airbnb imports); any other status removes it.
  */
 function handleStatusEdit(event) {
@@ -140,26 +140,26 @@ function handleStatusEdit(event) {
       const checkin = toIsoDate_(values[6]);
       const checkout = toIsoDate_(values[7]);
       if (overlapsBooked_(checkin, checkout, getBookedRanges_(true))) {
-        sheet.getRange(row, STATUS_COLUMN).setValue(STATUS_NEW).setNote(`Non confermata il ${new Date().toLocaleString('it-IT')}: date già occupate su Airbnb o da un'altra prenotazione diretta.`);
-        event.source.toast(`Riga ${row}: date non disponibili, prenotazione non bloccata.`, 'Villa Stefano', 10);
+        sheet.getRange(row, STATUS_COLUMN).setValue(STATUS_NEW).setNote(`Not confirmed on ${new Date().toLocaleString('en-GB')}: dates already taken on Airbnb or by another direct booking.`);
+        event.source.toast(`Row ${row}: dates unavailable, booking not blocked.`, 'Villa Stefano', 10);
         continue;
       }
       const created = calendar.createAllDayEvent(
-        `Villa Stefano - ${values[2]} ${values[3]} (diretta)`,
+        `Villa Stefano - ${values[2]} ${values[3]} (direct)`,
         dateFromIso_(checkin),
         dateFromIso_(checkout),
-        { description: `Telefono: ${values[4]}\nEmail: ${values[5]}\nOspiti: ${values[8]} (Adulti: ${values[9]}, Bambini: ${values[10]}, Neonati: ${values[11]})` }
+        { description: `Phone: ${values[4]}\nEmail: ${values[5]}\nGuests: ${values[8]} (Adults: ${values[9]}, Children: ${values[10]}, Infants: ${values[11]})` }
       );
       sheet.getRange(row, EVENT_ID_COLUMN).setValue(created.getId());
       sheet.getRange(row, STATUS_COLUMN).clearNote();
       CacheService.getScriptCache().remove(AVAILABILITY_CACHE_KEY);
-      event.source.toast(`Riga ${row}: date bloccate. Airbnb si aggiornerà entro alcune ore.`, 'Villa Stefano', 10);
+      event.source.toast(`Row ${row}: dates blocked. Airbnb will update within a few hours.`, 'Villa Stefano', 10);
     } else if (status !== STATUS_CONFIRMED && eventId) {
       const existing = calendar.getEventById(eventId);
       if (existing) existing.deleteEvent();
       sheet.getRange(row, EVENT_ID_COLUMN).clearContent();
       CacheService.getScriptCache().remove(AVAILABILITY_CACHE_KEY);
-      event.source.toast(`Riga ${row}: date sbloccate. Airbnb si aggiornerà entro alcune ore.`, 'Villa Stefano', 10);
+      event.source.toast(`Row ${row}: dates released. Airbnb will update within a few hours.`, 'Villa Stefano', 10);
     }
   }
 }
