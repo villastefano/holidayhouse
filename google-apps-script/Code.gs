@@ -52,7 +52,7 @@ function doPost(event) {
     if (isUnavailable_(clean_(data.checkin), clean_(data.checkout))) {
       return HtmlService.createHtmlOutput(unavailableMessage_(clean_(data.language)));
     }
-    const translatedMessage = translateToItalian_(clean_(data.message), clean_(data.language));
+    const translatedMessage = translateToEnglish_(clean_(data.message), clean_(data.language));
 
     // Avoid accidental double-clicks and basic form flooding.
     const cacheKey = Utilities.base64EncodeWebSafe(`villa-stefano:${data.email.toLowerCase()}`);
@@ -96,7 +96,7 @@ function getOrCreateSheet_() {
   if (!sheet) sheet = spreadsheet.insertSheet(SHEET_NAME);
 
   if (sheet.getLastRow() === 0) {
-    sheet.appendRow(['Enquiry date', 'Language', 'First name', 'Last name', 'Phone', 'Email', 'Check-in', 'Check-out', 'Total guests', 'Adults', 'Children', 'Infants', 'Original message', 'Message (Italian translation)', 'Status', 'Source', 'Calendar event ID']);
+    sheet.appendRow(['Enquiry date', 'Language', 'First name', 'Last name', 'Phone', 'Email', 'Check-in', 'Check-out', 'Total guests', 'Adults', 'Children', 'Infants', 'Original message', 'Message (English translation)', 'Status', 'Source', 'Calendar event ID']);
     sheet.setFrozenRows(1);
     const statusRule = SpreadsheetApp.newDataValidation()
       .requireValueInList([STATUS_NEW, STATUS_CONFIRMED, STATUS_CANCELLED], true)
@@ -312,33 +312,33 @@ function clean_(value) {
   return String(value || '').trim().slice(0, 500);
 }
 
-function translateToItalian_(message, language) {
-  if (!message || language === 'it') return message;
-  const sourceLanguage = { en: 'en', es: 'es', fr: 'fr' }[language];
-  return sourceLanguage ? LanguageApp.translate(message, sourceLanguage, 'it') : message;
+function translateToEnglish_(message, language) {
+  if (!message || language === 'en') return message;
+  const sourceLanguage = { it: 'it', es: 'es', fr: 'fr' }[language];
+  return sourceLanguage ? LanguageApp.translate(message, sourceLanguage, 'en') : message;
 }
 
 function redirectToWhatsApp_(data, translatedMessage) {
   const text = [
-    'Nuova richiesta per Villa Stefano',
+    'New enquiry for Villa Stefano',
     '',
-    `Nome: ${clean_(data.firstName)}`,
-    `Cognome: ${clean_(data.lastName)}`,
-    `Telefono: ${clean_(data.phone)}`,
+    `First name: ${clean_(data.firstName)}`,
+    `Last name: ${clean_(data.lastName)}`,
+    `Phone: ${clean_(data.phone)}`,
     `Email: ${clean_(data.email)}`,
-    `Check-in: ${formatDateItalian_(clean_(data.checkin))}`,
-    `Check-out: ${formatDateItalian_(clean_(data.checkout))}`,
-    `Ospiti: ${clean_(data.guests)} (Adulti: ${clean_(data.adults)}, Bambini: ${clean_(data.children)}, Neonati: ${clean_(data.infants)})`,
-    translatedMessage ? `\nMessaggio: ${translatedMessage}` : ''
+    `Check-in: ${formatDateEnglish_(clean_(data.checkin))}`,
+    `Check-out: ${formatDateEnglish_(clean_(data.checkout))}`,
+    `Guests: ${clean_(data.guests)} (Adults: ${clean_(data.adults)}, Children: ${clean_(data.children)}, Infants: ${clean_(data.infants)})`,
+    translatedMessage ? `\nMessage: ${translatedMessage}` : ''
   ].filter(Boolean).join('\n');
   const url = `https://wa.me/4407843936267?text=${encodeURIComponent(text)}`;
   return HtmlService.createHtmlOutput(`<script>window.top.location.replace(${JSON.stringify(url)});</script><p>Opening WhatsApp…</p>`);
 }
 
-function formatDateItalian_(value) {
+function formatDateEnglish_(value) {
   const [year, month, day] = value.split('-').map(Number);
-  const months = ['gennaio', 'febbraio', 'marzo', 'aprile', 'maggio', 'giugno', 'luglio', 'agosto', 'settembre', 'ottobre', 'novembre', 'dicembre'];
-  return `${String(day).padStart(2, '0')}-${months[month - 1]}-${year}`;
+  const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  return `${day} ${months[month - 1]} ${year}`;
 }
 
 function reply_(payload) {

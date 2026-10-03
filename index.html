@@ -428,10 +428,7 @@
         return !emailField.value || valid;
       }
       function formatMessageDate(value) {
-        const locale = {it:'it-IT',en:'en-GB',es:'es-ES',fr:'fr-FR'}[activeLanguage] || 'it-IT';
-        const parts = new Intl.DateTimeFormat(locale, { day:'2-digit', month:'long', year:'numeric' }).formatToParts(fromIsoDate(value));
-        const part = (type) => parts.find((item) => item.type === type)?.value || '';
-        return `${part('day')}-${part('month').toLowerCase()}-${part('year')}`;
+        return new Intl.DateTimeFormat('en-GB', { day:'numeric', month:'long', year:'numeric' }).format(fromIsoDate(value));
       }
       const today = new Date();
       checkIn.min = toIsoDate(today);
@@ -528,7 +525,7 @@
         }
         const form = new FormData(contactForm);
         const value = (name) => form.get(name).toString().trim();
-        const message = `Nuova richiesta per Villa Stefano\n\nNome: ${value('firstName')}\nCognome: ${value('lastName')}\nTelefono: ${value('phone')}\nEmail: ${value('email')}\nCheck-in: ${formatMessageDate(value('checkin'))}\nCheck-out: ${formatMessageDate(value('checkout'))}\nOspiti: ${value('guests')} (Adulti: ${value('adults')}, Bambini: ${value('children')}, Neonati: ${value('infants')})${value('message') ? `\n\nMessaggio: ${value('message')}` : ''}`;
+        const message = `New enquiry for Villa Stefano\n\nFirst name: ${value('firstName')}\nLast name: ${value('lastName')}\nPhone: ${value('phone')}\nEmail: ${value('email')}\nCheck-in: ${formatMessageDate(value('checkin'))}\nCheck-out: ${formatMessageDate(value('checkout'))}\nGuests: ${value('guests')} (Adults: ${value('adults')}, Children: ${value('children')}, Infants: ${value('infants')})${value('message') ? `\n\nMessage: ${value('message')}` : ''}`;
         window.open(`https://wa.me/4407843936267?text=${encodeURIComponent(message)}`, '_blank', 'noopener');
       });
     </script>
