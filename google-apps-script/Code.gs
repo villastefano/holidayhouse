@@ -15,7 +15,10 @@
 const SHEET_NAME = 'Enquiries';
 const STATUS_COLUMN = 15;
 const EVENT_ID_COLUMN = 17;
+const DIRECT_DISCOUNT = 0.05;
+const HEADERS = ['Enquiry date', 'Language', 'First name', 'Last name', 'Phone', 'Email', 'Check-in', 'Check-out', 'Total guests', 'Adults', 'Children', 'Infants', 'Original message', 'Message (English translation)', 'Status', 'Source', 'Calendar event ID', 'Airbnb total quoted (EUR)', 'Direct price -5% (EUR)'];
 const STATUS_NEW = 'New';
+const STATUS_AWAITING_PAYMENT = 'Awaiting payment';
 const STATUS_CONFIRMED = 'Confirmed';
 const STATUS_CANCELLED = 'Cancelled';
 const AVAILABILITY_CACHE_KEY = 'villa-stefano:availability';
@@ -52,6 +55,7 @@ function doPost(event) {
     // If the feed is down, accept the enquiry; confirmation re-checks before blocking.
     if (isUnavailable_(clean_(data.checkin), clean_(data.checkout))) return reply_({ ok: false, error: 'unavailable' });
     const translatedMessage = translateToEnglish_(clean_(data.message), clean_(data.language));
+    const airbnbPrice = parsePrice_(data.airbnbPrice);
 
     // Avoid accidental double-clicks and basic form flooding.
     const cacheKey = Utilities.base64EncodeWebSafe(`villa-stefano:${data.email.toLowerCase()}`);
@@ -76,7 +80,9 @@ function doPost(event) {
       translatedMessage,
       STATUS_NEW,
       'Website',
-      ''
+      '',
+      airbnbPrice || '',
+      airbnbPrice ? directPrice_(airbnbPrice) : ''
     ]);
     cache.put(cacheKey, '1', 90);
     notifyOwner_(data, translatedMessage);
@@ -97,14 +103,24 @@ function getOrCreateSheet_() {
   if (!sheet) sheet = spreadsheet.insertSheet(SHEET_NAME);
 
   if (sheet.getLastRow() === 0) {
-    sheet.appendRow(['Enquiry date', 'Language', 'First name', 'Last name', 'Phone', 'Email', 'Check-in', 'Check-out', 'Total guests', 'Adults', 'Children', 'Infants', 'Original message', 'Message (English translation)', 'Status', 'Source', 'Calendar event ID']);
+    sheet.appendRow(HEADERS);
     sheet.setFrozenRows(1);
-    const statusRule = SpreadsheetApp.newDataValidation()
-      .requireValueInList([STATUS_NEW, STATUS_CONFIRMED, STATUS_CANCELLED], true)
-      .build();
-    sheet.getRange(2, STATUS_COLUMN, sheet.getMaxRows() - 1, 1).setDataValidation(statusRule);
+    applyStatusValidation_(sheet);
   }
   return sheet;
+}
+
+function applyStatusValidation_(sheet) {
+  const statusRule = SpreadsheetApp.newDataValidation()
+    .requireValueInList([STATUS_NEW, STATUS_AWAITING_PAYMENT, STATUS_CONFIRMED, STATUS_CANCELLED], true)
+    .build();
+  sheet.getRange(2, STATUS_COLUMN, sheet.getMaxRows() - 1, 1).setDataValidation(statusRule);
+}
+
+// Brings an existing sheet up to the current headers and Status options.
+function upgradeSheet_(sheet) {
+  sheet.getRange(1, 1, 1, HEADERS.length).setValues([HEADERS]);
+  applyStatusValidation_(sheet);
 }
 
 /**
@@ -114,7 +130,7 @@ function getOrCreateSheet_() {
  */
 function setup() {
   const sheetId = PropertiesService.getScriptProperties().getProperty('SHEET_ID');
-  getOrCreateSheet_();
+  upgradeSheet_(getOrCreateSheet_());
   ScriptApp.getProjectTriggers()
     .filter((trigger) => ['handleStatusEdit', 'syncAll'].includes(trigger.getHandlerFunction()))
     .forEach((trigger) => ScriptApp.deleteTrigger(trigger));
@@ -337,6 +353,16 @@ function validateLead_(data) {
   if (!['it', 'en', 'es', 'fr'].includes(clean_(data.language))) throw new Error('Invalid language.');
 }
 
+// Optional guest-entered Airbnb total; anything unusable is ignored.
+function parsePrice_(value) {
+  const price = Number(String(value || '').replace(',', '.'));
+  return Number.isFinite(price) && price > 0 && price <= 100000 ? Math.round(price * 100) / 100 : 0;
+}
+
+function directPrice_(airbnbPrice) {
+  return Math.round(airbnbPrice * (1 - DIRECT_DISCOUNT) * 100) / 100;
+}
+
 function clean_(value) {
   return String(value || '').trim().slice(0, 500);
 }
@@ -348,6 +374,7 @@ function translateToEnglish_(message, language) {
 }
 
 function enquirySummary_(data, translatedMessage) {
+  const airbnbPrice = parsePrice_(data.airbnbPrice);
   return [
     'New enquiry for Villa Stefano',
     '',
@@ -358,6 +385,8 @@ function enquirySummary_(data, translatedMessage) {
     `Check-in: ${formatDateEnglish_(clean_(data.checkin))}`,
     `Check-out: ${formatDateEnglish_(clean_(data.checkout))}`,
     `Guests: ${clean_(data.guests)} (Adults: ${clean_(data.adults)}, Children: ${clean_(data.children)}, Infants: ${clean_(data.infants)})`,
+    airbnbPrice ? `Airbnb total quoted: EUR ${airbnbPrice.toFixed(2)} (screenshot to follow)` : '',
+    airbnbPrice ? `Direct price (-5%): EUR ${directPrice_(airbnbPrice).toFixed(2)}` : '',
     translatedMessage ? `\nMessage: ${translatedMessage}` : ''
   ].filter(Boolean).join('\n');
 }

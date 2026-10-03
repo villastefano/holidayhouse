@@ -49,7 +49,7 @@ On Airbnb: **Calendar -> (the listing) -> Availability -> Connect calendars -> E
 | `ALLOWED_HOSTNAME` | `villastefano.github.io` |
 | `NOTIFY_EMAIL` | *(optional)* address for enquiry emails. Leave it out to use the Google account that owns the script |
 
-4. In the editor, select the `setup` function and click **Run**, then approve the permissions. This creates the sheet headers and the Status dropdown, installs the Status trigger plus a sync that runs every 10 minutes, and tests both calendars. Fix any error it reports before continuing. It is safe to run again.
+4. In the editor, select the `setup` function and click **Run**, then approve the permissions. This creates or updates the sheet headers and the Status dropdown (`New`, `Awaiting payment`, `Confirmed`, `Cancelled`), installs the Status trigger plus a sync that runs every 10 minutes, and tests both calendars. Fix any error it reports before continuing. It is safe to run again.
 5. **Deploy -> New deployment -> Web app**: *Execute as* **Me**, *Who has access* **Anyone**. Copy the web app URL (ends in `/exec`).
 6. **Check it works:** open `<web app URL>?action=availability` in a browser. You should see `{"ok":true,"booked":[...]}` listing your current Airbnb bookings. `{"ok":false}` means a property or calendar is wrong - check **Executions** in the Apps Script sidebar for the error.
 
@@ -75,6 +75,7 @@ On Airbnb: **Availability -> Connect calendars -> Import calendar**. Paste the G
 ## Day-to-day
 
 - **New enquiries** arrive by email, on WhatsApp (if the guest continues there) and as a `New` row in the Sheet. Nothing is blocked until you confirm.
+- **Direct bookings (Airbnb total minus 5%, paid 100% upfront by bank transfer):** if the guest entered an Airbnb total, the email and the Sheet show it and the direct price. Check it against the guest's screenshot, send the quote and bank details, and set Status to `Awaiting payment`. This does **not** block the dates: Airbnb can still sell them until you are paid. When the transfer arrives, set Status to `Confirmed`.
 - **Confirm a direct booking:** set Status to `Confirmed`. Normally the event appears in the direct calendar within seconds, with a pop-up; if not, the 10-minute sync picks it up. To sync immediately, use the Sheet menu **Villa Stefano -> Sync confirmed bookings now** (reload the Sheet if the menu is missing). If the dates are no longer free, Status goes back to `New` with a note on the cell.
 - **Check it worked:** the **Calendar event ID** column is filled once the dates are blocked.
 - **Cancel:** set Status to `Cancelled`.
