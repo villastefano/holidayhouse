@@ -24,7 +24,7 @@ const STATUS_CANCELLED = 'Cancelled';
 const AVAILABILITY_CACHE_KEY = 'villa-stefano:availability';
 const AVAILABILITY_CACHE_SECONDS = 600;
 const AVAILABILITY_HORIZON_DAYS = 550;
-const REQUIRED_FIELDS = ['firstName', 'lastName', 'phone', 'email', 'checkin', 'checkout', 'guests', 'adults', 'children', 'infants', 'language'];
+const REQUIRED_FIELDS = ['firstName', 'lastName', 'phone', 'email', 'checkin', 'checkout', 'guests', 'adults', 'children', 'infants', 'language', 'message'];
 
 function doGet(event) {
   const action = event && event.parameter ? event.parameter.action : '';
@@ -204,7 +204,7 @@ function syncRow_(sheet, row, spreadsheet) {
       `Villa Stefano - ${values[2]} ${values[3]} (direct)`,
       dateFromIso_(checkin),
       dateFromIso_(checkout),
-      { description: `Phone: ${values[4]}\nEmail: ${values[5]}\nGuests: ${values[8]} (Adults: ${values[9]}, Children: ${values[10]}, Infants: ${values[11]})` }
+      { description: `Phone: ${values[4]}\nEmail: ${values[5]}\nGuests: ${values[8]} (Adults: ${values[9]}, Children: ${values[10]}) + Infants: ${values[11]}` }
     );
     sheet.getRange(row, EVENT_ID_COLUMN).setValue(created.getId());
     sheet.getRange(row, STATUS_COLUMN).clearNote();
@@ -348,8 +348,9 @@ function validateLead_(data) {
   maxCheckout.setDate(maxCheckout.getDate() + 30);
   if (new Date(`${clean_(data.checkout)}T00:00:00`) > maxCheckout) throw new Error('Stay exceeds 30 days.');
   if (!Number.isInteger(Number(data.guests)) || Number(data.guests) < 1 || Number(data.guests) > 9) throw new Error('Invalid guest count.');
-  const guestTypes = Number(data.adults) + Number(data.children) + Number(data.infants);
-  if (Number(data.adults) < 1 || guestTypes !== Number(data.guests)) throw new Error('Invalid guest types.');
+  // Guests = adults + children; infants are recorded but not counted (as on Airbnb).
+  if (Number(data.adults) < 1 || Number(data.adults) + Number(data.children) !== Number(data.guests)) throw new Error('Invalid guest types.');
+  if (!Number.isInteger(Number(data.infants)) || Number(data.infants) < 0 || Number(data.infants) > 5) throw new Error('Invalid infant count.');
   if (!['it', 'en', 'es', 'fr'].includes(clean_(data.language))) throw new Error('Invalid language.');
 }
 
@@ -384,7 +385,7 @@ function enquirySummary_(data, translatedMessage) {
     `Email: ${clean_(data.email)}`,
     `Check-in: ${formatDateEnglish_(clean_(data.checkin))}`,
     `Check-out: ${formatDateEnglish_(clean_(data.checkout))}`,
-    `Guests: ${clean_(data.guests)} (Adults: ${clean_(data.adults)}, Children: ${clean_(data.children)}, Infants: ${clean_(data.infants)})`,
+    `Guests: ${clean_(data.guests)} (Adults: ${clean_(data.adults)}, Children: ${clean_(data.children)}) + Infants: ${clean_(data.infants)}`,
     airbnbPrice ? `Airbnb total quoted: EUR ${airbnbPrice.toFixed(2)} (screenshot to follow)` : '',
     airbnbPrice ? `Direct price (-5%): EUR ${directPrice_(airbnbPrice).toFixed(2)}` : '',
     translatedMessage ? `\nMessage: ${translatedMessage}` : ''
