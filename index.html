@@ -126,6 +126,27 @@
       .guest-range output { min-width:36px; color:#f2d39d; font:500 29px/1 "Playfair Display",serif; text-align:right; }
       .guest-types { grid-column:span 2; display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-top:5px; }
       .guest-types input { min-height:44px; }
+      .availability { grid-column:span 2; }
+      .availability[hidden] { display:none; }
+      .availability-head { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+      .availability-nav { display:flex; gap:6px; }
+      .availability-nav button { width:34px; height:34px; color:white; background:transparent; border:1px solid rgba(255,255,255,.35); cursor:pointer; font:15px/1 Manrope,sans-serif; }
+      .availability-nav button:disabled { opacity:.25; cursor:default; }
+      .availability-months { display:grid; grid-template-columns:1fr 1fr; gap:28px; margin-top:6px; }
+      .availability-month h4 { margin:0 0 10px; color:#f8f3ea; font:500 17px/1.2 "Playfair Display",serif; text-transform:capitalize; }
+      .availability-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:3px; }
+      .availability-grid .weekday { color:rgba(255,255,255,.45); font:10px/2 "DM Mono",monospace; text-align:center; text-transform:uppercase; }
+      .availability-grid button { height:38px; padding:0; color:white; background:transparent; border:0; cursor:pointer; font:13px/1 Manrope,sans-serif; }
+      .availability-grid button:hover:not(:disabled) { outline:1px solid #e7c992; }
+      .availability-grid button:disabled { cursor:default; color:rgba(255,255,255,.28); }
+      .availability-grid button.booked { text-decoration:line-through; color:rgba(255,255,255,.22); }
+      .availability-grid button.in-range { background:rgba(175,90,61,.38); }
+      .availability-grid button.range-start,.availability-grid button.range-end { background:var(--terracotta); color:white; font-weight:700; }
+      .availability-foot { display:flex; flex-wrap:wrap; justify-content:space-between; gap:8px 18px; margin-top:4px; color:rgba(255,255,255,.6); font-size:11px; }
+      .availability-legend { display:flex; gap:16px; }
+      .availability-legend span:before { content:""; display:inline-block; width:10px; height:10px; margin-right:6px; vertical-align:-1px; }
+      .availability-legend .legend-booked:before { border:1px solid rgba(255,255,255,.3); background:repeating-linear-gradient(135deg,transparent 0 3px,rgba(255,255,255,.3) 3px 4px); }
+      .availability-legend .legend-selected:before { background:var(--terracotta); }
       .system-message { grid-column:span 2; display:none; margin:0; color:#f09b86; font:600 11px/1.5 Manrope,sans-serif; letter-spacing:.02em; }
       .system-message.visible { display:block; }
       .honeypot { position:absolute; left:-10000px; width:1px; height:1px; overflow:hidden; }
@@ -141,7 +162,7 @@
         .about,.signature,.location,.quote,.book,.airbnb-proof,.contact { padding-left:20px; padding-right:20px; } .about { padding-top:78px; padding-bottom:75px; } .about-grid,.signature-grid,.proof-inner { grid-template-columns:1fr; gap:35px; }
         .gallery { padding:0 20px 75px; grid-template-columns:1fr; grid-template-rows:320px 190px 190px; } .gallery figure:first-child { grid-row:auto; }
         .signature { padding-top:75px; padding-bottom:75px; } .features { grid-template-columns:1fr; } .feature:nth-child(odd),.feature:nth-child(even) { border-right:0; padding-left:0; padding-right:0; }
-        .location { min-height:520px; } footer { padding:22px 20px; flex-direction:column; } .book-cta { margin-bottom:72px; } .airbnb-proof,.contact { padding-top:75px; padding-bottom:75px; } .contact-form { grid-template-columns:1fr; } .contact-field.full,.contact-submit,.guest-types,.system-message { grid-column:span 1; } .guest-types { grid-template-columns:1fr; gap:10px; } .contact-submit { align-items:stretch; flex-direction:column; } .contact-submit .button { width:100%; }
+        .location { min-height:520px; } footer { padding:22px 20px; flex-direction:column; } .book-cta { margin-bottom:72px; } .airbnb-proof,.contact { padding-top:75px; padding-bottom:75px; } .contact-form { grid-template-columns:1fr; } .contact-field.full,.contact-submit,.guest-types,.system-message,.availability { grid-column:span 1; } .availability-months { grid-template-columns:1fr; } .availability-month + .availability-month { display:none; } .guest-types { grid-template-columns:1fr; gap:10px; } .contact-submit { align-items:stretch; flex-direction:column; } .contact-submit .button { width:100%; }
       }
     </style>
   </head>
@@ -198,7 +219,7 @@
         <section class="book" id="prenota"><div class="eyebrow" data-i18n="yourSummer">La vostra estate</div><h2 data-i18n-html="bookTitle">Scegli come<br><em>prenotare.</em></h2><p data-i18n="bookText">Per una risposta personalizzata e per verificare la disponibilità, scrivici direttamente su WhatsApp. Se preferisci, puoi anche prenotare tramite Airbnb.</p><div class="book-cta"><a class="button" href="#info"><span data-contact="bookPrimary">Richiedi disponibilità su WhatsApp</span> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a><a class="link-arrow" href="https://www.airbnb.it/rooms/6303698" target="_blank" rel="noopener" data-contact="bookAirbnb">Oppure prenota su Airbnb</a></div></section>
 
         <section class="contact" id="info"><div class="contact-inner"><div class="contact-head"><div class="eyebrow" data-contact="contactEyebrow">Contatto diretto</div><h2 data-contact-html="contactTitle">Chiedi informazioni<br><em>su WhatsApp.</em></h2><p data-contact="contactText">Raccontaci il soggiorno che immagini: ti risponderemo al più presto.</p></div>
-          <form class="contact-form" id="whatsapp-form" novalidate><div class="contact-field"><label for="guest-first-name" data-form="firstNameLabel">Nome</label><input id="guest-first-name" name="firstName" type="text" autocomplete="given-name" required data-form-placeholder="firstNamePlaceholder" placeholder="Es. Giulia" /></div><div class="contact-field"><label for="guest-last-name" data-form="lastNameLabel">Cognome</label><input id="guest-last-name" name="lastName" type="text" autocomplete="family-name" required data-form-placeholder="lastNamePlaceholder" placeholder="Es. Bianchi" /></div><div class="contact-field"><label for="guest-phone" data-contact="phoneLabel">Numero di telefono</label><input id="guest-phone" name="phone" type="tel" autocomplete="tel" required data-contact-placeholder="phonePlaceholder" placeholder="Es. +39 333 123 4567" /></div><div class="contact-field"><label for="guest-email" data-contact="emailLabel">Email</label><input id="guest-email" name="email" type="email" autocomplete="email" required data-contact-placeholder="emailPlaceholder" placeholder="Es. giulia@email.com" /></div><div class="contact-field"><label for="check-in" data-contact="checkinLabel">Check-in</label><input id="check-in" name="checkin" type="date" required /></div><div class="contact-field"><label for="check-out" data-contact="checkoutLabel">Check-out</label><input id="check-out" name="checkout" type="date" required /></div><p class="system-message" id="stay-warning" role="status" data-form="longStayWarning">È stato selezionato un periodo superiore a 3 settimane.</p><p class="system-message" id="date-error" role="alert"></p><div class="contact-field full"><label for="people-total" data-form="peopleTotalLabel">Numero totale di persone</label><div class="guest-range"><input id="people-total" name="guests" type="range" min="1" max="9" step="1" value="1" aria-describedby="people-total-value" /><output id="people-total-value" for="people-total">1</output></div></div><div class="guest-types"><div class="contact-field"><label for="adults" data-form="adultsLabel">Adulti (13+)</label><input id="adults" name="adults" type="number" min="1" max="9" step="1" value="1" required /></div><div class="contact-field"><label for="children" data-form="childrenLabel">Bambini (2–12)</label><input id="children" name="children" type="number" min="0" max="9" step="1" value="0" required /></div><div class="contact-field"><label for="infants" data-form="infantsLabel">Neonati (0–2)</label><input id="infants" name="infants" type="number" min="0" max="9" step="1" value="0" required /></div></div><p class="system-message" id="guest-error" role="alert"></p><div class="contact-field full"><label for="guest-message" data-form="messageLabel">Messaggio</label><textarea id="guest-message" name="message" maxlength="1000" data-form-placeholder="messagePlaceholder" placeholder="Raccontaci le tue esigenze o eventuali richieste speciali."></textarea></div><div class="honeypot" aria-hidden="true"><label for="website">Website</label><input id="website" name="website" type="text" tabindex="-1" autocomplete="off" /></div><input type="hidden" id="form-language" name="language" value="it" /><div class="contact-submit"><small data-contact="privacyNote">Aprendo WhatsApp, i dati inseriti verranno usati solo per comporre la tua richiesta.</small><button class="button" type="submit"><span data-contact="whatsappButton">Invia su WhatsApp</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div></form>
+          <form class="contact-form" id="whatsapp-form" novalidate><div class="contact-field"><label for="guest-first-name" data-form="firstNameLabel">Nome</label><input id="guest-first-name" name="firstName" type="text" autocomplete="given-name" required data-form-placeholder="firstNamePlaceholder" placeholder="Es. Giulia" /></div><div class="contact-field"><label for="guest-last-name" data-form="lastNameLabel">Cognome</label><input id="guest-last-name" name="lastName" type="text" autocomplete="family-name" required data-form-placeholder="lastNamePlaceholder" placeholder="Es. Bianchi" /></div><div class="contact-field"><label for="guest-phone" data-contact="phoneLabel">Numero di telefono</label><input id="guest-phone" name="phone" type="tel" autocomplete="tel" required data-contact-placeholder="phonePlaceholder" placeholder="Es. +39 333 123 4567" /></div><div class="contact-field"><label for="guest-email" data-contact="emailLabel">Email</label><input id="guest-email" name="email" type="email" autocomplete="email" required data-contact-placeholder="emailPlaceholder" placeholder="Es. giulia@email.com" /></div><div class="contact-field availability" id="availability" hidden><div class="availability-head"><label id="availability-label" data-availability="availabilityLabel">Disponibilità</label><div class="availability-nav"><button type="button" id="availability-prev" data-availability-aria="previousMonth" aria-label="Mese precedente">&#8249;</button><button type="button" id="availability-next" data-availability-aria="nextMonth" aria-label="Mese successivo">&#8250;</button></div></div><div class="availability-months" id="availability-months" aria-labelledby="availability-label"></div><div class="availability-foot"><span id="availability-hint" role="status"></span><span class="availability-legend"><span class="legend-booked" data-availability="legendBooked">Non disponibile</span><span class="legend-selected" data-availability="legendSelected">Il tuo soggiorno</span></span></div></div><div class="contact-field"><label for="check-in" data-contact="checkinLabel">Check-in</label><input id="check-in" name="checkin" type="date" required /></div><div class="contact-field"><label for="check-out" data-contact="checkoutLabel">Check-out</label><input id="check-out" name="checkout" type="date" required /></div><p class="system-message" id="stay-warning" role="status" data-form="longStayWarning">È stato selezionato un periodo superiore a 3 settimane.</p><p class="system-message" id="date-error" role="alert"></p><div class="contact-field full"><label for="people-total" data-form="peopleTotalLabel">Numero totale di persone</label><div class="guest-range"><input id="people-total" name="guests" type="range" min="1" max="9" step="1" value="1" aria-describedby="people-total-value" /><output id="people-total-value" for="people-total">1</output></div></div><div class="guest-types"><div class="contact-field"><label for="adults" data-form="adultsLabel">Adulti (13+)</label><input id="adults" name="adults" type="number" min="1" max="9" step="1" value="1" required /></div><div class="contact-field"><label for="children" data-form="childrenLabel">Bambini (2–12)</label><input id="children" name="children" type="number" min="0" max="9" step="1" value="0" required /></div><div class="contact-field"><label for="infants" data-form="infantsLabel">Neonati (0–2)</label><input id="infants" name="infants" type="number" min="0" max="9" step="1" value="0" required /></div></div><p class="system-message" id="guest-error" role="alert"></p><div class="contact-field full"><label for="guest-message" data-form="messageLabel">Messaggio</label><textarea id="guest-message" name="message" maxlength="1000" data-form-placeholder="messagePlaceholder" placeholder="Raccontaci le tue esigenze o eventuali richieste speciali."></textarea></div><div class="honeypot" aria-hidden="true"><label for="website">Website</label><input id="website" name="website" type="text" tabindex="-1" autocomplete="off" /></div><input type="hidden" id="form-language" name="language" value="it" /><div class="contact-submit"><small data-contact="privacyNote">Aprendo WhatsApp, i dati inseriti verranno usati solo per comporre la tua richiesta.</small><button class="button" type="submit"><span data-contact="whatsappButton">Invia su WhatsApp</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div></form>
         </div></section>
       </main>
       <footer><span>Villa Stefano · Playa Grande, Sicilia</span><span data-i18n="rights">© 2026 · Tutti i diritti riservati</span></footer>
@@ -223,6 +244,12 @@
         es: { firstNameLabel:'Nombre',firstNamePlaceholder:'Ej. Julia',lastNameLabel:'Apellidos',lastNamePlaceholder:'Ej. García',peopleTotalLabel:'Número total de personas',adultsLabel:'Adultos (13+)',childrenLabel:'Niños (2–12)',infantsLabel:'Bebés (0–2)',messageLabel:'Mensaje',messagePlaceholder:'Cuéntanos tus necesidades o cualquier petición especial.',longStayWarning:'Se ha seleccionado un periodo superior a 3 semanas.',checkoutAfter:'La salida debe ser posterior a la entrada.',maxStay:'La estancia no puede superar los 30 días.',guestTotal:'Adultos, niños y bebés deben sumar el número total de personas.',emailInvalid:'Introduce una dirección de correo válida.' },
         fr: { firstNameLabel:'Prénom',firstNamePlaceholder:'Ex. Julie',lastNameLabel:'Nom',lastNamePlaceholder:'Ex. Martin',peopleTotalLabel:'Nombre total de voyageurs',adultsLabel:'Adultes (13+)',childrenLabel:'Enfants (2–12)',infantsLabel:'Bébés (0–2)',messageLabel:'Message',messagePlaceholder:'Parlez-nous de vos besoins ou de toute demande particulière.',longStayWarning:'Une période de plus de 3 semaines a été sélectionnée.',checkoutAfter:'Le départ doit être postérieur à l’arrivée.',maxStay:'Le séjour ne peut pas dépasser 30 jours.',guestTotal:'Les adultes, enfants et bébés doivent correspondre au nombre total de voyageurs.',emailInvalid:'Saisissez une adresse e-mail valide.' }
       };
+      const availabilityTranslations = {
+        it: { availabilityLabel:'Disponibilità',legendBooked:'Non disponibile',legendSelected:'Il tuo soggiorno',previousMonth:'Mese precedente',nextMonth:'Mese successivo',checkinHint:'Seleziona la data di arrivo.',checkoutHint:'Ora seleziona la data di partenza.',unavailableDates:'Alcune notti selezionate non sono disponibili. Scegli altre date.' },
+        en: { availabilityLabel:'Availability',legendBooked:'Unavailable',legendSelected:'Your stay',previousMonth:'Previous month',nextMonth:'Next month',checkinHint:'Select your arrival date.',checkoutHint:'Now select your departure date.',unavailableDates:'Some of the selected nights are not available. Please choose other dates.' },
+        es: { availabilityLabel:'Disponibilidad',legendBooked:'No disponible',legendSelected:'Tu estancia',previousMonth:'Mes anterior',nextMonth:'Mes siguiente',checkinHint:'Selecciona la fecha de llegada.',checkoutHint:'Ahora selecciona la fecha de salida.',unavailableDates:'Algunas de las noches seleccionadas no están disponibles. Elige otras fechas.' },
+        fr: { availabilityLabel:'Disponibilités',legendBooked:'Indisponible',legendSelected:'Votre séjour',previousMonth:'Mois précédent',nextMonth:'Mois suivant',checkinHint:'Sélectionnez votre date d’arrivée.',checkoutHint:'Sélectionnez maintenant votre date de départ.',unavailableDates:'Certaines nuits sélectionnées ne sont pas disponibles. Veuillez choisir d’autres dates.' }
+      };
       let activeLanguage = 'it';
       let currentStats = null;
       const picker = document.getElementById('language-picker');
@@ -243,6 +270,7 @@
         document.getElementById('form-language').value = language;
         picker.value = language;
         updateStatsNote();
+        if (window.refreshAvailability) window.refreshAvailability();
         try { localStorage.setItem('villa-stefano-language', language); } catch (_) {}
       }
       function updateStatsNote() {
@@ -306,12 +334,83 @@
         let error = '';
         if (checkOut.value <= checkIn.value) error = dictionary.checkoutAfter;
         else if (checkOut.value > latestCheckout) error = dictionary.maxStay;
+        else if (!rangeIsFree(checkIn.value, checkOut.value)) error = (availabilityTranslations[activeLanguage] || availabilityTranslations.it).unavailableDates;
         checkOut.setCustomValidity(error);
         setSystemMessage(dateError, error);
         const duration = error ? 0 : daysBetween(checkIn.value, checkOut.value);
         stayWarning.classList.toggle('visible', duration > 21);
+        renderAvailability();
         return !error;
       }
+      // Booked nights from Airbnb + confirmed direct bookings, end exclusive.
+      let bookedRanges = [];
+      let availabilityLoaded = false;
+      let datesTouched = false;
+      let pickingCheckout = false;
+      let availabilityMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+      const availabilityPanel = document.getElementById('availability');
+      const availabilityMonths = document.getElementById('availability-months');
+      const availabilityPrev = document.getElementById('availability-prev');
+      const availabilityNext = document.getElementById('availability-next');
+      const availabilityHint = document.getElementById('availability-hint');
+      function isBookedNight(value) {
+        return bookedRanges.some((range) => value >= range.start && value < range.end);
+      }
+      function rangeIsFree(start, end) {
+        return !bookedRanges.some((range) => start < range.end && end > range.start);
+      }
+      function canCheckIn(value) {
+        return value >= toIsoDate(new Date()) && !isBookedNight(value);
+      }
+      function canCheckOut(value) {
+        return value > checkIn.value && daysBetween(checkIn.value, value) <= 30 && rangeIsFree(checkIn.value, value);
+      }
+      function renderAvailability() {
+        if (!availabilityLoaded) return;
+        const locale = {it:'it-IT',en:'en-GB',es:'es-ES',fr:'fr-FR'}[activeLanguage] || 'it-IT';
+        const dictionary = availabilityTranslations[activeLanguage] || availabilityTranslations.it;
+        const firstMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+        const weekdays = Array.from({ length:7 }, (_, index) => new Intl.DateTimeFormat(locale, { weekday:'narrow' }).format(new Date(2024, 0, 1 + index)));
+        availabilityMonths.replaceChildren();
+        for (let offset = 0; offset < 2; offset++) {
+          const month = new Date(availabilityMonth.getFullYear(), availabilityMonth.getMonth() + offset, 1);
+          const wrapper = document.createElement('div');
+          wrapper.className = 'availability-month';
+          const title = document.createElement('h4');
+          title.textContent = new Intl.DateTimeFormat(locale, { month:'long', year:'numeric' }).format(month);
+          const grid = document.createElement('div');
+          grid.className = 'availability-grid';
+          weekdays.forEach((name) => { const cell = document.createElement('span'); cell.className = 'weekday'; cell.textContent = name; grid.append(cell); });
+          for (let blank = 0; blank < (month.getDay() + 6) % 7; blank++) grid.append(document.createElement('span'));
+          const days = new Date(month.getFullYear(), month.getMonth() + 1, 0).getDate();
+          for (let day = 1; day <= days; day++) {
+            const value = toIsoDate(new Date(month.getFullYear(), month.getMonth(), day));
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.textContent = day;
+            button.dataset.date = value;
+            button.disabled = !(canCheckIn(value) || (pickingCheckout && canCheckOut(value)));
+            button.classList.toggle('booked', isBookedNight(value));
+            button.classList.toggle('in-range', value > checkIn.value && value < checkOut.value);
+            button.classList.toggle('range-start', value === checkIn.value);
+            button.classList.toggle('range-end', value === checkOut.value);
+            button.setAttribute('aria-label', new Intl.DateTimeFormat(locale, { day:'numeric', month:'long', year:'numeric' }).format(fromIsoDate(value)));
+            grid.append(button);
+          }
+          wrapper.append(title, grid);
+          availabilityMonths.append(wrapper);
+        }
+        availabilityPrev.disabled = availabilityMonth <= firstMonth;
+        availabilityNext.disabled = availabilityMonth >= new Date(firstMonth.getFullYear(), firstMonth.getMonth() + 16, 1);
+        availabilityHint.textContent = pickingCheckout ? dictionary.checkoutHint : dictionary.checkinHint;
+        document.querySelectorAll('[data-availability]').forEach((element) => { element.textContent = dictionary[element.dataset.availability]; });
+        document.querySelectorAll('[data-availability-aria]').forEach((element) => { element.setAttribute('aria-label', dictionary[element.dataset.availabilityAria]); });
+      }
+      function showMonthOf(value) {
+        const date = fromIsoDate(value);
+        availabilityMonth = new Date(date.getFullYear(), date.getMonth(), 1);
+      }
+      window.refreshAvailability = () => { if (checkIn.value && checkOut.value) validateDates(); };
       function validateGuestTypes() {
         const dictionary = formTranslations[activeLanguage] || formTranslations.it;
         const total = Number(peopleTotal.value);
@@ -329,10 +428,7 @@
         return !emailField.value || valid;
       }
       function formatMessageDate(value) {
-        const locale = {it:'it-IT',en:'en-GB',es:'es-ES',fr:'fr-FR'}[activeLanguage] || 'it-IT';
-        const parts = new Intl.DateTimeFormat(locale, { day:'2-digit', month:'long', year:'numeric' }).formatToParts(fromIsoDate(value));
-        const part = (type) => parts.find((item) => item.type === type)?.value || '';
-        return `${part('day')}-${part('month').toLowerCase()}-${part('year')}`;
+        return new Intl.DateTimeFormat('en-GB', { day:'numeric', month:'long', year:'numeric' }).format(fromIsoDate(value));
       }
       const today = new Date();
       checkIn.min = toIsoDate(today);
@@ -341,10 +437,51 @@
       validateDates();
       peopleTotalValue.textContent = peopleTotal.value;
       checkIn.addEventListener('change', () => {
+        datesTouched = true;
+        pickingCheckout = false;
         if (!checkOut.value || checkOut.value <= checkIn.value) checkOut.value = toIsoDate(addDays(fromIsoDate(checkIn.value), 1));
+        if (checkIn.value) showMonthOf(checkIn.value);
         validateDates();
       });
-      checkOut.addEventListener('change', validateDates);
+      checkOut.addEventListener('change', () => {
+        datesTouched = true;
+        pickingCheckout = false;
+        validateDates();
+      });
+      availabilityMonths.addEventListener('click', (event) => {
+        const button = event.target.closest('button[data-date]');
+        if (!button || button.disabled) return;
+        const value = button.dataset.date;
+        datesTouched = true;
+        if (pickingCheckout && canCheckOut(value)) {
+          checkOut.value = value;
+          pickingCheckout = false;
+        } else {
+          checkIn.value = value;
+          checkOut.value = toIsoDate(addDays(fromIsoDate(value), 1));
+          pickingCheckout = true;
+        }
+        validateDates();
+      });
+      availabilityPrev.addEventListener('click', () => { availabilityMonth = new Date(availabilityMonth.getFullYear(), availabilityMonth.getMonth() - 1, 1); renderAvailability(); });
+      availabilityNext.addEventListener('click', () => { availabilityMonth = new Date(availabilityMonth.getFullYear(), availabilityMonth.getMonth() + 1, 1); renderAvailability(); });
+      if (secureFormConfig.endpoint) {
+        fetch(`${secureFormConfig.endpoint}?action=availability`).then((response) => response.ok ? response.json() : null).then((data) => {
+          if (!data || !data.ok || !Array.isArray(data.booked)) return;
+          bookedRanges = data.booked.filter((range) => /^\d{4}-\d{2}-\d{2}$/.test(range.start) && /^\d{4}-\d{2}-\d{2}$/.test(range.end));
+          availabilityLoaded = true;
+          availabilityPanel.hidden = false;
+          // Move the untouched default stay to the first free night.
+          if (!datesTouched && !rangeIsFree(checkIn.value, checkOut.value)) {
+            let candidate = new Date();
+            for (let day = 0; day < 550 && !canCheckIn(toIsoDate(candidate)); day++) candidate = addDays(candidate, 1);
+            checkIn.value = toIsoDate(candidate);
+            checkOut.value = toIsoDate(addDays(candidate, 1));
+            showMonthOf(checkIn.value);
+          }
+          validateDates();
+        }).catch(() => {});
+      }
       peopleTotal.addEventListener('input', () => {
         const availableForAdults = Number(peopleTotal.value) - Number(children.value || 0) - Number(infants.value || 0);
         if (availableForAdults >= 1) adults.value = availableForAdults;
@@ -388,7 +525,7 @@
         }
         const form = new FormData(contactForm);
         const value = (name) => form.get(name).toString().trim();
-        const message = `Nuova richiesta per Villa Stefano\n\nNome: ${value('firstName')}\nCognome: ${value('lastName')}\nTelefono: ${value('phone')}\nEmail: ${value('email')}\nCheck-in: ${formatMessageDate(value('checkin'))}\nCheck-out: ${formatMessageDate(value('checkout'))}\nOspiti: ${value('guests')} (Adulti: ${value('adults')}, Bambini: ${value('children')}, Neonati: ${value('infants')})${value('message') ? `\n\nMessaggio: ${value('message')}` : ''}`;
+        const message = `New enquiry for Villa Stefano\n\nFirst name: ${value('firstName')}\nLast name: ${value('lastName')}\nPhone: ${value('phone')}\nEmail: ${value('email')}\nCheck-in: ${formatMessageDate(value('checkin'))}\nCheck-out: ${formatMessageDate(value('checkout'))}\nGuests: ${value('guests')} (Adults: ${value('adults')}, Children: ${value('children')}, Infants: ${value('infants')})${value('message') ? `\n\nMessage: ${value('message')}` : ''}`;
         window.open(`https://wa.me/4407843936267?text=${encodeURIComponent(message)}`, '_blank', 'noopener');
       });
     </script>
