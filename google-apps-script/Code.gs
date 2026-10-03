@@ -24,7 +24,7 @@ const STATUS_CANCELLED = 'Cancelled';
 const AVAILABILITY_CACHE_KEY = 'villa-stefano:availability';
 const AVAILABILITY_CACHE_SECONDS = 600;
 const AVAILABILITY_HORIZON_DAYS = 550;
-const REQUIRED_FIELDS = ['firstName', 'lastName', 'phone', 'email', 'checkin', 'checkout', 'guests', 'adults', 'children', 'infants', 'language', 'message', 'airbnbPrice'];
+const REQUIRED_FIELDS = ['firstName', 'lastName', 'phone', 'email', 'checkin', 'checkout', 'guests', 'adults', 'children', 'infants', 'language', 'message'];
 
 function doGet(event) {
   const action = event && event.parameter ? event.parameter.action : '';
@@ -351,7 +351,6 @@ function validateLead_(data) {
   // Guests = adults + children; infants are recorded but not counted (as on Airbnb).
   if (Number(data.adults) < 1 || Number(data.adults) + Number(data.children) !== Number(data.guests)) throw new Error('Invalid guest types.');
   if (!Number.isInteger(Number(data.infants)) || Number(data.infants) < 0 || Number(data.infants) > 5) throw new Error('Invalid infant count.');
-  if (!parsePrice_(data.airbnbPrice)) throw new Error('Invalid Airbnb total.');
   if (!['it', 'en', 'es', 'fr'].includes(clean_(data.language))) throw new Error('Invalid language.');
 }
 
