@@ -7,7 +7,7 @@ One-time setup, about 20 minutes. Use the same Google account throughout (Sheet,
 - **Airbnb -> website.** The website asks the Apps Script for booked nights. The script reads the Airbnb calendar export plus the "direct" Google Calendar, merges them and returns date ranges only (no guest data). It is cached for 10 minutes, and the full feed is re-read every time, so cancellations on Airbnb reopen the dates on the website automatically.
 - **Website -> Airbnb.** Enquiries land in the Google Sheet as `New`. When you set **Status** to `Confirmed`, the script re-checks Airbnb and, if the dates are still free, creates an all-day event in the direct calendar. Airbnb imports that calendar and blocks the dates. Setting Status to `Cancelled` (or back to `New`) deletes the event and unblocks the dates.
 - **Submit-time check.** When a guest submits, the script re-reads Airbnb and rejects dates taken since the page loaded. If the Airbnb feed is down, the enquiry is still accepted; the check at confirmation still applies.
-- **Enquiries.** Each valid enquiry is logged in the Sheet, the guest's message is translated into English, and WhatsApp opens with a pre-filled English summary for you. Repeat submissions from the same email within 90 seconds are not logged twice.
+- **Enquiries.** Each valid enquiry is logged in the Sheet and emailed to you (reply goes straight to the guest), the guest's message is translated into English, the guest sees a confirmation on the page, and WhatsApp then opens with a pre-filled English summary. The email means you get every enquiry even if the guest has no WhatsApp. Repeat submissions from the same email within 90 seconds are not logged twice.
 
 **Limitation:** Airbnb refreshes imported calendars on its own schedule (typically every few hours). Between confirming a direct booking and Airbnb's next refresh, Airbnb can still sell those dates. Real-time sync is only available through Airbnb-approved channel managers.
 
@@ -47,6 +47,7 @@ On Airbnb: **Calendar -> (the listing) -> Availability -> Connect calendars -> E
 | `AIRBNB_ICAL_URL` | from step 3 |
 | `TURNSTILE_SECRET` | Turnstile secret key |
 | `ALLOWED_HOSTNAME` | `villastefano.github.io` |
+| `NOTIFY_EMAIL` | *(optional)* address for enquiry emails. Leave it out to use the Google account that owns the script |
 
 4. In the editor, select the `setup` function and click **Run**, then approve the permissions. This creates the sheet headers and the Status dropdown, installs the Status trigger plus a sync that runs every 10 minutes, and tests both calendars. Fix any error it reports before continuing. It is safe to run again.
 5. **Deploy -> New deployment -> Web app**: *Execute as* **Me**, *Who has access* **Anyone**. Copy the web app URL (ends in `/exec`).
@@ -73,7 +74,7 @@ On Airbnb: **Availability -> Connect calendars -> Import calendar**. Paste the G
 
 ## Day-to-day
 
-- **New enquiries** arrive on WhatsApp and as a `New` row in the Sheet. Nothing is blocked until you confirm.
+- **New enquiries** arrive by email, on WhatsApp (if the guest continues there) and as a `New` row in the Sheet. Nothing is blocked until you confirm.
 - **Confirm a direct booking:** set Status to `Confirmed`. Normally the event appears in the direct calendar within seconds, with a pop-up; if not, the 10-minute sync picks it up. To sync immediately, use the Sheet menu **Villa Stefano -> Sync confirmed bookings now** (reload the Sheet if the menu is missing). If the dates are no longer free, Status goes back to `New` with a note on the cell.
 - **Check it worked:** the **Calendar event ID** column is filled once the dates are blocked.
 - **Cancel:** set Status to `Cancelled`.
