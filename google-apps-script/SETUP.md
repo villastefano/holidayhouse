@@ -48,7 +48,7 @@ On Airbnb: **Calendar -> (the listing) -> Availability -> Connect calendars -> E
 | `TURNSTILE_SECRET` | Turnstile secret key |
 | `ALLOWED_HOSTNAME` | `villastefano.github.io` |
 
-4. In the editor, select the `setup` function and click **Run**, then approve the permissions. This creates the sheet headers and the Status dropdown, installs the confirmation trigger and tests both calendars. Fix any error it reports before continuing.
+4. In the editor, select the `setup` function and click **Run**, then approve the permissions. This creates the sheet headers and the Status dropdown, installs the Status trigger plus a sync that runs every 10 minutes, and tests both calendars. Fix any error it reports before continuing. It is safe to run again.
 5. **Deploy -> New deployment -> Web app**: *Execute as* **Me**, *Who has access* **Anyone**. Copy the web app URL (ends in `/exec`).
 6. **Check it works:** open `<web app URL>?action=availability` in a browser. You should see `{"ok":true,"booked":[...]}` listing your current Airbnb bookings. `{"ok":false}` means a property or calendar is wrong - check **Executions** in the Apps Script sidebar for the error.
 
@@ -74,9 +74,10 @@ On Airbnb: **Availability -> Connect calendars -> Import calendar**. Paste the G
 ## Day-to-day
 
 - **New enquiries** arrive on WhatsApp and as a `New` row in the Sheet. Nothing is blocked until you confirm.
-- **Confirm a direct booking:** set Status to `Confirmed`. A pop-up confirms it, or says the dates are no longer free (Status then goes back to `New`, with a note on the cell).
+- **Confirm a direct booking:** set Status to `Confirmed`. Normally the event appears in the direct calendar within seconds, with a pop-up; if not, the 10-minute sync picks it up. To sync immediately, use the Sheet menu **Villa Stefano -> Sync confirmed bookings now** (reload the Sheet if the menu is missing). If the dates are no longer free, Status goes back to `New` with a note on the cell.
+- **Check it worked:** the **Calendar event ID** column is filled once the dates are blocked.
 - **Cancel:** set Status to `Cancelled`.
 - **Change dates after confirming:** set Status to `Cancelled`, correct Check-in/Check-out, then set `Confirmed` again.
 - **Block dates for yourself (maintenance, family):** add an all-day event in the direct calendar. It blocks both the website and Airbnb.
 - **Keep the private links private:** the Airbnb export link and the Google secret iCal address each give read access to your bookings. If one leaks, reset it (Airbnb: export a new link; Google: **Reset** next to the secret address) and update Script Properties or the Airbnb import.
-- **After editing the code:** **Deploy -> Manage deployments -> Edit -> Version: New version**. This keeps the same URL. A *new* deployment changes the URL and breaks the website.
+- **After editing the code:** paste the new `Code.gs`, run `setup` again, then **Deploy -> Manage deployments -> Edit -> Version: New version**. This keeps the same URL. A *new* deployment changes the URL and breaks the website.
