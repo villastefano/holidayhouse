@@ -197,7 +197,7 @@ function setup() {
   const sheetId = PropertiesService.getScriptProperties().getProperty('SHEET_ID');
   upgradeSheet_(getOrCreateSheet_());
   ScriptApp.getProjectTriggers()
-    .filter((trigger) => ['handleStatusEdit', 'syncAll'].includes(trigger.getHandlerFunction()))
+    .filter((trigger) => ['handleStatusEdit', 'syncAll', 'purgeOldEnquiries'].includes(trigger.getHandlerFunction()))
     .forEach((trigger) => ScriptApp.deleteTrigger(trigger));
   ScriptApp.newTrigger('handleStatusEdit').forSpreadsheet(sheetId).onEdit().create();
   ScriptApp.newTrigger('syncAll').timeBased().everyMinutes(10).create();
