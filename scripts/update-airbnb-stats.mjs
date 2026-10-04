@@ -21,11 +21,13 @@ try {
 
   // Airbnb's "Guest favourite" badge; the website shows it only while the listing does.
   const guestFavourite = /amato dagli ospiti|guest favou?rite/i.test(text);
+  // Superhost status, shown on the website only while Airbnb shows it.
+  const superhost = /\bsuperhost\b/i.test(text);
 
   const previous = JSON.parse(await readFile('stats.json', 'utf8'));
-  const next = { ...previous, rating, reviews, guestFavourite, updatedAt: new Date().toISOString(), source: 'Airbnb' };
+  const next = { ...previous, rating, reviews, guestFavourite, superhost, updatedAt: new Date().toISOString(), source: 'Airbnb' };
   await writeFile('stats.json', `${JSON.stringify(next, null, 2)}\n`);
-  console.log(`Updated Airbnb stats: ${rating} stars, ${reviews} reviews, guest favourite: ${guestFavourite}.`);
+  console.log(`Updated Airbnb stats: ${rating} stars, ${reviews} reviews, guest favourite: ${guestFavourite}, superhost: ${superhost}.`);
 } finally {
   await browser.close();
 }
