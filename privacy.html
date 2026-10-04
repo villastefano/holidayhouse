@@ -34,8 +34,6 @@
     <header><div class="bar"><a class="brand" href="./">Villa Stefano</a><select id="language" aria-label="Language"><option value="it">IT</option><option value="en">EN</option><option value="es">ES</option><option value="fr">FR</option></select></div></header>
     <main id="content"></main>
     <script>
-      // Controller address: the only value to fill in. Do not publish while it is blank.
-      const CONTROLLER_ADDRESS = '';
       const LAST_UPDATED = '2026-10-04';
 
       // Privacy requests go through the enquiry form on the main page.
@@ -44,7 +42,7 @@
         en: {
           eyebrow: 'Privacy notice', title: 'How we handle your data', updated: 'Last updated',
           sections: [
-            ['Who we are', `<p>The data controller is Villa Stefano, ${CONTROLLER_ADDRESS}. For any privacy question or request, write to us using the ${form('enquiry form')}.</p>`],
+            ['Who we are', `<p>The data controller is Villa Stefano. For any privacy question or request, write to us using the ${form('enquiry form')}.</p>`],
             ['What we collect and why', `<ul>
               <li><strong>Enquiry form.</strong> Name, phone, email, dates, number of guests, your message, the Airbnb price you enter (optional) and your language. We use them to answer your enquiry, send a quote and manage a booking. Legal basis: steps taken at your request before a contract (Art. 6(1)(b) GDPR).</li>
               <li><strong>Spam protection.</strong> Cloudflare Turnstile checks that the form is sent by a person, using technical data from your browser and your IP address. Legal basis: our legitimate interest in protecting the form (Art. 6(1)(f)).</li>
@@ -72,7 +70,7 @@
         it: {
           eyebrow: 'Informativa privacy', title: 'Come trattiamo i tuoi dati', updated: 'Ultimo aggiornamento',
           sections: [
-            ['Chi siamo', `<p>Il titolare del trattamento è Villa Stefano, ${CONTROLLER_ADDRESS}. Per qualsiasi domanda o richiesta sulla privacy scrivici tramite il ${form('modulo di richiesta')}.</p>`],
+            ['Chi siamo', `<p>Il titolare del trattamento è Villa Stefano. Per qualsiasi domanda o richiesta sulla privacy scrivici tramite il ${form('modulo di richiesta')}.</p>`],
             ['Quali dati raccogliamo e perché', `<ul>
               <li><strong>Modulo di richiesta.</strong> Nome, telefono, email, date, numero di ospiti, il tuo messaggio, il prezzo Airbnb che indichi (facoltativo) e la lingua. Li usiamo per rispondere alla richiesta, inviarti un preventivo e gestire la prenotazione. Base giuridica: misure precontrattuali adottate su tua richiesta (art. 6, par. 1, lett. b, GDPR).</li>
               <li><strong>Protezione dallo spam.</strong> Cloudflare Turnstile verifica che il modulo sia inviato da una persona, usando dati tecnici del browser e il tuo indirizzo IP. Base giuridica: nostro legittimo interesse a proteggere il modulo (art. 6, par. 1, lett. f).</li>
@@ -100,7 +98,7 @@
         es: {
           eyebrow: 'Aviso de privacidad', title: 'Cómo tratamos tus datos', updated: 'Última actualización',
           sections: [
-            ['Quiénes somos', `<p>El responsable del tratamiento es Villa Stefano, ${CONTROLLER_ADDRESS}. Para cualquier pregunta o solicitud sobre privacidad, escríbenos mediante el ${form('formulario de solicitud')}.</p>`],
+            ['Quiénes somos', `<p>El responsable del tratamiento es Villa Stefano. Para cualquier pregunta o solicitud sobre privacidad, escríbenos mediante el ${form('formulario de solicitud')}.</p>`],
             ['Qué datos recogemos y para qué', `<ul>
               <li><strong>Formulario de solicitud.</strong> Nombre, teléfono, email, fechas, número de huéspedes, tu mensaje, el precio de Airbnb que indiques (opcional) y tu idioma. Los usamos para responder a tu solicitud, enviarte un presupuesto y gestionar la reserva. Base jurídica: medidas precontractuales a petición tuya (art. 6.1.b RGPD).</li>
               <li><strong>Protección contra el spam.</strong> Cloudflare Turnstile comprueba que el formulario lo envía una persona, usando datos técnicos del navegador y tu dirección IP. Base jurídica: nuestro interés legítimo en proteger el formulario (art. 6.1.f).</li>
@@ -128,7 +126,7 @@
         fr: {
           eyebrow: 'Politique de confidentialité', title: 'Comment nous traitons vos données', updated: 'Dernière mise à jour',
           sections: [
-            ['Qui sommes-nous', `<p>Le responsable du traitement est Villa Stefano, ${CONTROLLER_ADDRESS}. Pour toute question ou demande relative à la confidentialité, écrivez-nous via le ${form('formulaire de demande')}.</p>`],
+            ['Qui sommes-nous', `<p>Le responsable du traitement est Villa Stefano. Pour toute question ou demande relative à la confidentialité, écrivez-nous via le ${form('formulaire de demande')}.</p>`],
             ['Données collectées et finalités', `<ul>
               <li><strong>Formulaire de demande.</strong> Nom, téléphone, email, dates, nombre de voyageurs, votre message, le prix Airbnb que vous indiquez (facultatif) et votre langue. Nous les utilisons pour répondre à votre demande, vous envoyer un devis et gérer la réservation. Base juridique : mesures précontractuelles prises à votre demande (art. 6, par. 1, b, RGPD).</li>
               <li><strong>Protection contre le spam.</strong> Cloudflare Turnstile vérifie que le formulaire est envoyé par une personne, à l'aide de données techniques du navigateur et de votre adresse IP. Base juridique : notre intérêt légitime à protéger le formulaire (art. 6, par. 1, f).</li>
