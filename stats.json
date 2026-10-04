@@ -1,6 +1,8 @@
 {
   "rating": 4.89,
   "reviews": 113,
-  "updatedAt": "2026-10-03T19:26:07.891Z",
-  "source": "Airbnb"
+  "updatedAt": "2026-10-04T17:54:42.842Z",
+  "source": "Airbnb",
+  "guestFavourite": true,
+  "superhost": true
 }
