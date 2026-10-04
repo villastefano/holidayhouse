@@ -28,6 +28,14 @@ const REQUIRED_FIELDS = ['firstName', 'lastName', 'phone', 'email', 'checkin', '
 
 function doGet(event) {
   const action = event && event.parameter ? event.parameter.action : '';
+  if (action === 'view' || action === 'views') {
+    try {
+      return reply_({ ok: true, views7: action === 'view' ? recordView_() : countViews_() });
+    } catch (error) {
+      console.error(error);
+      return reply_({ ok: false });
+    }
+  }
   if (action !== 'availability') return reply_({ ok: false, message: 'Not available.' });
   try {
     return reply_({ ok: true, booked: getBookedRanges_(false) });
@@ -94,6 +102,63 @@ function doPost(event) {
   }
 }
 
+/**
+ * Page-view counter: one count per browser per day (the website dedupes),
+ * stored per Rome date in Script Properties and mirrored to a "Views" tab.
+ * No personal data is received or stored.
+ */
+const VIEWS_PROPERTY = 'VIEW_COUNTS';
+const VIEWS_SHEET_NAME = 'Views';
+
+function recordView_() {
+  const lock = LockService.getScriptLock();
+  lock.waitLock(10000);
+  try {
+    const properties = PropertiesService.getScriptProperties();
+    const counts = JSON.parse(properties.getProperty(VIEWS_PROPERTY) || '{}');
+    const today = toIsoDate_(new Date());
+    counts[today] = (counts[today] || 0) + 1;
+    const oldest = addDaysIso_(today, -8);
+    Object.keys(counts).forEach((day) => { if (day < oldest) delete counts[day]; });
+    properties.setProperty(VIEWS_PROPERTY, JSON.stringify(counts));
+    writeViewsRow_(today, counts[today]);
+    return sumLastSevenDays_(counts, today);
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function countViews_() {
+  const counts = JSON.parse(PropertiesService.getScriptProperties().getProperty(VIEWS_PROPERTY) || '{}');
+  return sumLastSevenDays_(counts, toIsoDate_(new Date()));
+}
+
+// Rolling window: today so far plus the previous 6 days.
+function sumLastSevenDays_(counts, today) {
+  const first = addDaysIso_(today, -6);
+  return Object.keys(counts).reduce((total, day) => (day >= first && day <= today ? total + counts[day] : total), 0);
+}
+
+function writeViewsRow_(day, count) {
+  try {
+    const spreadsheet = SpreadsheetApp.openById(PropertiesService.getScriptProperties().getProperty('SHEET_ID'));
+    let sheet = spreadsheet.getSheetByName(VIEWS_SHEET_NAME);
+    if (!sheet) {
+      sheet = spreadsheet.insertSheet(VIEWS_SHEET_NAME);
+      sheet.appendRow(['Date', 'Unique visitors']);
+      sheet.setFrozenRows(1);
+    }
+    const lastRow = sheet.getLastRow();
+    if (lastRow > 1 && toIsoDate_(sheet.getRange(lastRow, 1).getValue()) === day) {
+      sheet.getRange(lastRow, 2).setValue(count);
+    } else {
+      sheet.appendRow([day, count]);
+    }
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 function getOrCreateSheet_() {
   const sheetId = PropertiesService.getScriptProperties().getProperty('SHEET_ID');
   if (!sheetId) throw new Error('SHEET_ID is not configured.');
@@ -139,6 +204,7 @@ function setup() {
   getDirectCalendar_();
   getBookedRanges_(true);
   MailApp.getRemainingDailyQuota();
+  writeViewsRow_(toIsoDate_(new Date()), JSON.parse(PropertiesService.getScriptProperties().getProperty(VIEWS_PROPERTY) || '{}')[toIsoDate_(new Date())] || 0);
   syncAll();
 }
 
