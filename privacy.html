@@ -6,10 +6,13 @@
     <meta name="robots" content="noindex" />
     <meta name="theme-color" content="#172b2a" />
     <title>Privacy · Villa Stefano</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=DM+Mono&family=Manrope:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;1,500&display=swap" rel="stylesheet" />
+    <link rel="preload" href="fonts/manrope-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="fonts/playfair-display-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
     <style>
+      @font-face { font-family:"Manrope"; font-style:normal; font-weight:200 800; font-display:swap; src:url('fonts/manrope-latin-wght-normal.woff2') format('woff2'); }
+      @font-face { font-family:"Playfair Display"; font-style:normal; font-weight:400 900; font-display:swap; src:url('fonts/playfair-display-latin-wght-normal.woff2') format('woff2'); }
+      @font-face { font-family:"Playfair Display"; font-style:italic; font-weight:400 900; font-display:swap; src:url('fonts/playfair-display-latin-wght-italic.woff2') format('woff2'); }
+      @font-face { font-family:"DM Mono"; font-style:normal; font-weight:400; font-display:swap; src:url('fonts/dm-mono-latin-400-normal.woff2') format('woff2'); }
       :root { --ink:#182827; --paper:#fcfaf5; --terracotta:#af5a3d; --muted:#67706b; --line:rgba(24,40,39,.16); }
       * { box-sizing:border-box; }
       body { margin:0; background:var(--paper); color:var(--ink); font:16px/1.65 Manrope,Arial,sans-serif; }
@@ -47,7 +50,7 @@
               <li><strong>Enquiry form.</strong> Name, phone, email, dates, number of guests, your message, the Airbnb price you enter (optional) and your language. We use them to answer your enquiry, send a quote and manage a booking. Legal basis: steps taken at your request before a contract (Art. 6(1)(b) GDPR).</li>
               <li><strong>Spam protection.</strong> Cloudflare Turnstile checks that the form is sent by a person, using technical data from your browser and your IP address. Legal basis: our legitimate interest in protecting the form (Art. 6(1)(f)).</li>
               <li><strong>Visit counter.</strong> Your browser stores the date of your last visit so that each visit is counted once per day. We receive no personal data: only an anonymous daily total, kept for 8 days. Your language choice is also stored in your browser. Legal basis: legitimate interest (Art. 6(1)(f)).</li>
-              <li><strong>Website delivery.</strong> When the page loads, your IP address reaches the services that deliver it: GitHub Pages (hosting), Google Fonts (fonts) and Airbnb's image servers (photos). Legal basis: legitimate interest in running the website (Art. 6(1)(f)).</li>
+              <li><strong>Website delivery.</strong> When the page loads, your IP address reaches the services that deliver it: GitHub Pages (hosting) and Airbnb's image servers (photos). Legal basis: legitimate interest in running the website (Art. 6(1)(f)).</li>
             </ul>
             <p>We do not use advertising or tracking cookies, we do not sell your data and we take no automated decisions about you.</p>`],
             ['Who receives your data', `<ul>
@@ -75,7 +78,7 @@
               <li><strong>Modulo di richiesta.</strong> Nome, telefono, email, date, numero di ospiti, il tuo messaggio, il prezzo Airbnb che indichi (facoltativo) e la lingua. Li usiamo per rispondere alla richiesta, inviarti un preventivo e gestire la prenotazione. Base giuridica: misure precontrattuali adottate su tua richiesta (art. 6, par. 1, lett. b, GDPR).</li>
               <li><strong>Protezione dallo spam.</strong> Cloudflare Turnstile verifica che il modulo sia inviato da una persona, usando dati tecnici del browser e il tuo indirizzo IP. Base giuridica: nostro legittimo interesse a proteggere il modulo (art. 6, par. 1, lett. f).</li>
               <li><strong>Contatore delle visite.</strong> Il tuo browser memorizza la data dell'ultima visita, così ogni visita viene contata una sola volta al giorno. Non riceviamo dati personali: solo un totale giornaliero anonimo, conservato per 8 giorni. Anche la lingua scelta resta memorizzata nel browser. Base giuridica: legittimo interesse (art. 6, par. 1, lett. f).</li>
-              <li><strong>Erogazione del sito.</strong> Al caricamento della pagina il tuo indirizzo IP raggiunge i servizi che la forniscono: GitHub Pages (hosting), Google Fonts (caratteri) e i server di immagini di Airbnb (foto). Base giuridica: legittimo interesse al funzionamento del sito (art. 6, par. 1, lett. f).</li>
+              <li><strong>Erogazione del sito.</strong> Al caricamento della pagina il tuo indirizzo IP raggiunge i servizi che la forniscono: GitHub Pages (hosting) e i server di immagini di Airbnb (foto). Base giuridica: legittimo interesse al funzionamento del sito (art. 6, par. 1, lett. f).</li>
             </ul>
             <p>Non usiamo cookie pubblicitari o di tracciamento, non vendiamo i tuoi dati e non prendiamo decisioni automatizzate che ti riguardano.</p>`],
             ['A chi comunichiamo i dati', `<ul>
@@ -103,7 +106,7 @@
               <li><strong>Formulario de solicitud.</strong> Nombre, teléfono, email, fechas, número de huéspedes, tu mensaje, el precio de Airbnb que indiques (opcional) y tu idioma. Los usamos para responder a tu solicitud, enviarte un presupuesto y gestionar la reserva. Base jurídica: medidas precontractuales a petición tuya (art. 6.1.b RGPD).</li>
               <li><strong>Protección contra el spam.</strong> Cloudflare Turnstile comprueba que el formulario lo envía una persona, usando datos técnicos del navegador y tu dirección IP. Base jurídica: nuestro interés legítimo en proteger el formulario (art. 6.1.f).</li>
               <li><strong>Contador de visitas.</strong> Tu navegador guarda la fecha de tu última visita para que cada visita cuente una sola vez al día. No recibimos datos personales: solo un total diario anónimo, conservado 8 días. Tu elección de idioma también se guarda en el navegador. Base jurídica: interés legítimo (art. 6.1.f).</li>
-              <li><strong>Funcionamiento del sitio.</strong> Al cargar la página, tu dirección IP llega a los servicios que la ofrecen: GitHub Pages (alojamiento), Google Fonts (tipografías) y los servidores de imágenes de Airbnb (fotos). Base jurídica: interés legítimo en el funcionamiento del sitio (art. 6.1.f).</li>
+              <li><strong>Funcionamiento del sitio.</strong> Al cargar la página, tu dirección IP llega a los servicios que la ofrecen: GitHub Pages (alojamiento) y los servidores de imágenes de Airbnb (fotos). Base jurídica: interés legítimo en el funcionamiento del sitio (art. 6.1.f).</li>
             </ul>
             <p>No usamos cookies publicitarias ni de seguimiento, no vendemos tus datos y no tomamos decisiones automatizadas sobre ti.</p>`],
             ['Quién recibe tus datos', `<ul>
@@ -131,7 +134,7 @@
               <li><strong>Formulaire de demande.</strong> Nom, téléphone, email, dates, nombre de voyageurs, votre message, le prix Airbnb que vous indiquez (facultatif) et votre langue. Nous les utilisons pour répondre à votre demande, vous envoyer un devis et gérer la réservation. Base juridique : mesures précontractuelles prises à votre demande (art. 6, par. 1, b, RGPD).</li>
               <li><strong>Protection contre le spam.</strong> Cloudflare Turnstile vérifie que le formulaire est envoyé par une personne, à l'aide de données techniques du navigateur et de votre adresse IP. Base juridique : notre intérêt légitime à protéger le formulaire (art. 6, par. 1, f).</li>
               <li><strong>Compteur de visites.</strong> Votre navigateur enregistre la date de votre dernière visite afin que chaque visite ne soit comptée qu'une fois par jour. Nous ne recevons aucune donnée personnelle : seulement un total quotidien anonyme, conservé 8 jours. Votre choix de langue est également enregistré dans le navigateur. Base juridique : intérêt légitime (art. 6, par. 1, f).</li>
-              <li><strong>Fonctionnement du site.</strong> Au chargement de la page, votre adresse IP parvient aux services qui la fournissent : GitHub Pages (hébergement), Google Fonts (polices) et les serveurs d'images d'Airbnb (photos). Base juridique : intérêt légitime au fonctionnement du site (art. 6, par. 1, f).</li>
+              <li><strong>Fonctionnement du site.</strong> Au chargement de la page, votre adresse IP parvient aux services qui la fournissent : GitHub Pages (hébergement) et les serveurs d'images d'Airbnb (photos). Base juridique : intérêt légitime au fonctionnement du site (art. 6, par. 1, f).</li>
             </ul>
             <p>Nous n'utilisons pas de cookies publicitaires ou de suivi, nous ne vendons pas vos données et nous ne prenons aucune décision automatisée vous concernant.</p>`],
             ['Destinataires des données', `<ul>
