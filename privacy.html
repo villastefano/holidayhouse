@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <meta name="theme-color" content="#172b2a" />
+    <title>Privacy · Villa Stefano</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono&family=Manrope:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;1,500&display=swap" rel="stylesheet" />
+    <style>
+      :root { --ink:#182827; --paper:#fcfaf5; --terracotta:#af5a3d; --muted:#67706b; --line:rgba(24,40,39,.16); }
+      * { box-sizing:border-box; }
+      body { margin:0; background:var(--paper); color:var(--ink); font:16px/1.65 Manrope,Arial,sans-serif; }
+      header { background:var(--ink); color:white; }
+      .bar { width:min(860px,calc(100% - 40px)); margin:auto; min-height:72px; display:flex; align-items:center; justify-content:space-between; gap:16px; }
+      .brand { color:white; text-decoration:none; font:600 21px/1 "Playfair Display",serif; }
+      select { color:white; background:transparent; border:1px solid rgba(255,255,255,.4); padding:8px 10px; min-height:44px; font:700 14px Manrope,sans-serif; }
+      select option { color:var(--ink); }
+      main { width:min(860px,calc(100% - 40px)); margin:auto; padding:56px 0 80px; }
+      .eyebrow { color:var(--terracotta); font:11px/1.2 "DM Mono",monospace; letter-spacing:.13em; text-transform:uppercase; }
+      h1 { margin:14px 0 8px; font:500 clamp(38px,7vw,56px)/1.05 "Playfair Display",serif; letter-spacing:-.02em; }
+      .updated { color:var(--muted); font-size:14px; margin:0 0 36px; }
+      h2 { margin:40px 0 10px; padding-top:22px; border-top:1px solid var(--line); font:500 25px/1.2 "Playfair Display",serif; }
+      p,li { color:#2c3a39; }
+      ul { padding-left:22px; }
+      li { margin:6px 0; }
+      a { color:var(--terracotta); }
+      .back { display:inline-flex; align-items:center; min-height:44px; margin-top:36px; font-weight:700; }
+    </style>
+  </head>
+  <body>
+    <header><div class="bar"><a class="brand" href="./">Villa Stefano</a><select id="language" aria-label="Language"><option value="it">IT</option><option value="en">EN</option><option value="es">ES</option><option value="fr">FR</option></select></div></header>
+    <main id="content"></main>
+    <script>
+      // Controller details: the only values to fill in. Do not publish while either is blank.
+      const CONTROLLER_NAME = '';
+      const CONTROLLER_ADDRESS = '';
+      const CONTACT_EMAIL = 'marcoflaccavento@gmail.com';
+      const LAST_UPDATED = '2026-10-04';
+
+      const mail = `<a href="mailto:${CONTACT_EMAIL}">${CONTACT_EMAIL}</a>`;
+      const notices = {
+        en: {
+          eyebrow: 'Privacy notice', title: 'How we handle your data', updated: 'Last updated',
+          sections: [
+            ['Who we are', `<p>The data controller is Villa Stefano, managed by ${CONTROLLER_NAME}, ${CONTROLLER_ADDRESS}. For any privacy question or request, write to ${mail}.</p>`],
+            ['What we collect and why', `<ul>
+              <li><strong>Enquiry form.</strong> Name, phone, email, dates, number of guests, your message, the Airbnb price you enter (optional) and your language. We use them to answer your enquiry, send a quote and manage a booking. Legal basis: steps taken at your request before a contract (Art. 6(1)(b) GDPR).</li>
+              <li><strong>Spam protection.</strong> Cloudflare Turnstile checks that the form is sent by a person, using technical data from your browser and your IP address. Legal basis: our legitimate interest in protecting the form (Art. 6(1)(f)).</li>
+              <li><strong>Visit counter.</strong> Your browser stores the date of your last visit so that each visit is counted once per day. We receive no personal data: only an anonymous daily total, kept for 8 days. Your language choice is also stored in your browser. Legal basis: legitimate interest (Art. 6(1)(f)).</li>
+              <li><strong>Website delivery.</strong> When the page loads, your IP address reaches the services that deliver it: GitHub Pages (hosting), Google Fonts (fonts) and Airbnb's image servers (photos). Legal basis: legitimate interest in running the website (Art. 6(1)(f)).</li>
+            </ul>
+            <p>We do not use advertising or tracking cookies, we do not sell your data and we take no automated decisions about you.</p>`],
+            ['Who receives your data', `<ul>
+              <li>Google (Sheets, Apps Script, Gmail and Translate): stores enquiries, sends us the enquiry email and translates your message into English.</li>
+              <li>Cloudflare: spam protection.</li>
+              <li>GitHub: website hosting.</li>
+              <li>WhatsApp (Meta): only if you choose to continue the conversation there, under WhatsApp's own privacy policy.</li>
+              <li>Airbnb: only if you book on Airbnb, under Airbnb's own privacy policy.</li>
+            </ul>
+            <p>Some of these providers may process data outside the European Economic Area, for example in the United States. In that case the transfer relies on safeguards recognised by EU law, such as the EU-US Data Privacy Framework or the European Commission's Standard Contractual Clauses.</p>`],
+            ['How long we keep it', `<ul>
+              <li>Enquiries that do not become a booking: deleted after 12 months.</li>
+              <li>Confirmed bookings: kept for as long as Italian tax and accounting law requires (generally 10 years).</li>
+              <li>Visit counter: anonymous daily totals for 8 days. The date stored in your browser stays until you clear your browser data.</li>
+            </ul>
+            <p>Information required by law when you arrive (for example guest registration with the police) is handled separately at check-in, not through this website.</p>`],
+            ['Your rights', `<p>You can ask to access, correct or delete your data, to restrict or object to its use, and to receive it in a portable format. Write to ${mail}. You also have the right to complain to the Italian data protection authority, the Garante per la protezione dei dati personali (<a href="https://www.garanteprivacy.it" rel="noopener">garanteprivacy.it</a>), or to the authority in your country.</p>`],
+          ],
+          back: 'Back to the website',
+        },
+        it: {
+          eyebrow: 'Informativa privacy', title: 'Come trattiamo i tuoi dati', updated: 'Ultimo aggiornamento',
+          sections: [
+            ['Chi siamo', `<p>Il titolare del trattamento è Villa Stefano, gestita da ${CONTROLLER_NAME}, ${CONTROLLER_ADDRESS}. Per qualsiasi domanda o richiesta sulla privacy scrivi a ${mail}.</p>`],
+            ['Quali dati raccogliamo e perché', `<ul>
+              <li><strong>Modulo di richiesta.</strong> Nome, telefono, email, date, numero di ospiti, il tuo messaggio, il prezzo Airbnb che indichi (facoltativo) e la lingua. Li usiamo per rispondere alla richiesta, inviarti un preventivo e gestire la prenotazione. Base giuridica: misure precontrattuali adottate su tua richiesta (art. 6, par. 1, lett. b, GDPR).</li>
+              <li><strong>Protezione dallo spam.</strong> Cloudflare Turnstile verifica che il modulo sia inviato da una persona, usando dati tecnici del browser e il tuo indirizzo IP. Base giuridica: nostro legittimo interesse a proteggere il modulo (art. 6, par. 1, lett. f).</li>
+              <li><strong>Contatore delle visite.</strong> Il tuo browser memorizza la data dell'ultima visita, così ogni visita viene contata una sola volta al giorno. Non riceviamo dati personali: solo un totale giornaliero anonimo, conservato per 8 giorni. Anche la lingua scelta resta memorizzata nel browser. Base giuridica: legittimo interesse (art. 6, par. 1, lett. f).</li>
+              <li><strong>Erogazione del sito.</strong> Al caricamento della pagina il tuo indirizzo IP raggiunge i servizi che la forniscono: GitHub Pages (hosting), Google Fonts (caratteri) e i server di immagini di Airbnb (foto). Base giuridica: legittimo interesse al funzionamento del sito (art. 6, par. 1, lett. f).</li>
+            </ul>
+            <p>Non usiamo cookie pubblicitari o di tracciamento, non vendiamo i tuoi dati e non prendiamo decisioni automatizzate che ti riguardano.</p>`],
+            ['A chi comunichiamo i dati', `<ul>
+              <li>Google (Fogli, Apps Script, Gmail e Traduttore): conserva le richieste, ci invia l'email di richiesta e traduce il tuo messaggio in inglese.</li>
+              <li>Cloudflare: protezione dallo spam.</li>
+              <li>GitHub: hosting del sito.</li>
+              <li>WhatsApp (Meta): solo se scegli di proseguire la conversazione lì, secondo l'informativa privacy di WhatsApp.</li>
+              <li>Airbnb: solo se prenoti su Airbnb, secondo l'informativa privacy di Airbnb.</li>
+            </ul>
+            <p>Alcuni di questi fornitori possono trattare dati fuori dallo Spazio economico europeo, ad esempio negli Stati Uniti. In tal caso il trasferimento si basa su garanzie riconosciute dal diritto dell'UE, come l'EU-US Data Privacy Framework o le Clausole contrattuali standard della Commissione europea.</p>`],
+            ['Per quanto tempo li conserviamo', `<ul>
+              <li>Richieste che non diventano prenotazioni: cancellate dopo 12 mesi.</li>
+              <li>Prenotazioni confermate: conservate per il tempo previsto dalla normativa fiscale e contabile italiana (in genere 10 anni).</li>
+              <li>Contatore delle visite: totali giornalieri anonimi per 8 giorni. La data memorizzata nel browser resta finché non cancelli i dati di navigazione.</li>
+            </ul>
+            <p>Le informazioni richieste dalla legge al tuo arrivo (ad esempio la comunicazione degli ospiti alla Polizia di Stato) sono gestite separatamente al check-in, non tramite questo sito.</p>`],
+            ['I tuoi diritti', `<p>Puoi chiedere l'accesso, la rettifica o la cancellazione dei tuoi dati, la limitazione o l'opposizione al trattamento e la portabilità dei dati. Scrivi a ${mail}. Hai inoltre il diritto di proporre reclamo al Garante per la protezione dei dati personali (<a href="https://www.garanteprivacy.it" rel="noopener">garanteprivacy.it</a>) o all'autorità del tuo Paese.</p>`],
+          ],
+          back: 'Torna al sito',
+        },
+        es: {
+          eyebrow: 'Aviso de privacidad', title: 'Cómo tratamos tus datos', updated: 'Última actualización',
+          sections: [
+            ['Quiénes somos', `<p>El responsable del tratamiento es Villa Stefano, gestionada por ${CONTROLLER_NAME}, ${CONTROLLER_ADDRESS}. Para cualquier pregunta o solicitud sobre privacidad, escribe a ${mail}.</p>`],
+            ['Qué datos recogemos y para qué', `<ul>
+              <li><strong>Formulario de solicitud.</strong> Nombre, teléfono, email, fechas, número de huéspedes, tu mensaje, el precio de Airbnb que indiques (opcional) y tu idioma. Los usamos para responder a tu solicitud, enviarte un presupuesto y gestionar la reserva. Base jurídica: medidas precontractuales a petición tuya (art. 6.1.b RGPD).</li>
+              <li><strong>Protección contra el spam.</strong> Cloudflare Turnstile comprueba que el formulario lo envía una persona, usando datos técnicos del navegador y tu dirección IP. Base jurídica: nuestro interés legítimo en proteger el formulario (art. 6.1.f).</li>
+              <li><strong>Contador de visitas.</strong> Tu navegador guarda la fecha de tu última visita para que cada visita cuente una sola vez al día. No recibimos datos personales: solo un total diario anónimo, conservado 8 días. Tu elección de idioma también se guarda en el navegador. Base jurídica: interés legítimo (art. 6.1.f).</li>
+              <li><strong>Funcionamiento del sitio.</strong> Al cargar la página, tu dirección IP llega a los servicios que la ofrecen: GitHub Pages (alojamiento), Google Fonts (tipografías) y los servidores de imágenes de Airbnb (fotos). Base jurídica: interés legítimo en el funcionamiento del sitio (art. 6.1.f).</li>
+            </ul>
+            <p>No usamos cookies publicitarias ni de seguimiento, no vendemos tus datos y no tomamos decisiones automatizadas sobre ti.</p>`],
+            ['Quién recibe tus datos', `<ul>
+              <li>Google (Hojas de cálculo, Apps Script, Gmail y Traductor): guarda las solicitudes, nos envía el email de la solicitud y traduce tu mensaje al inglés.</li>
+              <li>Cloudflare: protección contra el spam.</li>
+              <li>GitHub: alojamiento del sitio.</li>
+              <li>WhatsApp (Meta): solo si decides continuar la conversación allí, según la política de privacidad de WhatsApp.</li>
+              <li>Airbnb: solo si reservas en Airbnb, según la política de privacidad de Airbnb.</li>
+            </ul>
+            <p>Algunos de estos proveedores pueden tratar datos fuera del Espacio Económico Europeo, por ejemplo en Estados Unidos. En ese caso, la transferencia se basa en garantías reconocidas por el derecho de la UE, como el Marco de Privacidad de Datos UE-EE. UU. o las Cláusulas Contractuales Tipo de la Comisión Europea.</p>`],
+            ['Cuánto tiempo los conservamos', `<ul>
+              <li>Solicitudes que no se convierten en reserva: se eliminan a los 12 meses.</li>
+              <li>Reservas confirmadas: se conservan el tiempo que exige la normativa fiscal y contable italiana (en general 10 años).</li>
+              <li>Contador de visitas: totales diarios anónimos durante 8 días. La fecha guardada en tu navegador permanece hasta que borres los datos de navegación.</li>
+            </ul>
+            <p>La información exigida por ley a tu llegada (por ejemplo, el registro de huéspedes ante la policía) se gestiona por separado en el check-in, no a través de este sitio.</p>`],
+            ['Tus derechos', `<p>Puedes solicitar el acceso, la rectificación o la supresión de tus datos, la limitación u oposición a su tratamiento y su portabilidad. Escribe a ${mail}. También tienes derecho a presentar una reclamación ante la autoridad italiana de protección de datos, el Garante per la protezione dei dati personali (<a href="https://www.garanteprivacy.it" rel="noopener">garanteprivacy.it</a>), o ante la autoridad de tu país.</p>`],
+          ],
+          back: 'Volver al sitio',
+        },
+        fr: {
+          eyebrow: 'Politique de confidentialité', title: 'Comment nous traitons vos données', updated: 'Dernière mise à jour',
+          sections: [
+            ['Qui sommes-nous', `<p>Le responsable du traitement est Villa Stefano, gérée par ${CONTROLLER_NAME}, ${CONTROLLER_ADDRESS}. Pour toute question ou demande relative à la confidentialité, écrivez à ${mail}.</p>`],
+            ['Données collectées et finalités', `<ul>
+              <li><strong>Formulaire de demande.</strong> Nom, téléphone, email, dates, nombre de voyageurs, votre message, le prix Airbnb que vous indiquez (facultatif) et votre langue. Nous les utilisons pour répondre à votre demande, vous envoyer un devis et gérer la réservation. Base juridique : mesures précontractuelles prises à votre demande (art. 6, par. 1, b, RGPD).</li>
+              <li><strong>Protection contre le spam.</strong> Cloudflare Turnstile vérifie que le formulaire est envoyé par une personne, à l'aide de données techniques du navigateur et de votre adresse IP. Base juridique : notre intérêt légitime à protéger le formulaire (art. 6, par. 1, f).</li>
+              <li><strong>Compteur de visites.</strong> Votre navigateur enregistre la date de votre dernière visite afin que chaque visite ne soit comptée qu'une fois par jour. Nous ne recevons aucune donnée personnelle : seulement un total quotidien anonyme, conservé 8 jours. Votre choix de langue est également enregistré dans le navigateur. Base juridique : intérêt légitime (art. 6, par. 1, f).</li>
+              <li><strong>Fonctionnement du site.</strong> Au chargement de la page, votre adresse IP parvient aux services qui la fournissent : GitHub Pages (hébergement), Google Fonts (polices) et les serveurs d'images d'Airbnb (photos). Base juridique : intérêt légitime au fonctionnement du site (art. 6, par. 1, f).</li>
+            </ul>
+            <p>Nous n'utilisons pas de cookies publicitaires ou de suivi, nous ne vendons pas vos données et nous ne prenons aucune décision automatisée vous concernant.</p>`],
+            ['Destinataires des données', `<ul>
+              <li>Google (Sheets, Apps Script, Gmail et Traduction) : conserve les demandes, nous envoie l'email de demande et traduit votre message en anglais.</li>
+              <li>Cloudflare : protection contre le spam.</li>
+              <li>GitHub : hébergement du site.</li>
+              <li>WhatsApp (Meta) : uniquement si vous choisissez d'y poursuivre la conversation, selon la politique de confidentialité de WhatsApp.</li>
+              <li>Airbnb : uniquement si vous réservez sur Airbnb, selon la politique de confidentialité d'Airbnb.</li>
+            </ul>
+            <p>Certains de ces prestataires peuvent traiter des données hors de l'Espace économique européen, par exemple aux États-Unis. Dans ce cas, le transfert repose sur des garanties reconnues par le droit de l'UE, comme le cadre de protection des données UE-États-Unis ou les clauses contractuelles types de la Commission européenne.</p>`],
+            ['Durée de conservation', `<ul>
+              <li>Demandes qui ne deviennent pas des réservations : supprimées au bout de 12 mois.</li>
+              <li>Réservations confirmées : conservées aussi longtemps que l'exige la législation fiscale et comptable italienne (en général 10 ans).</li>
+              <li>Compteur de visites : totaux quotidiens anonymes pendant 8 jours. La date enregistrée dans votre navigateur y reste jusqu'à ce que vous effaciez vos données de navigation.</li>
+            </ul>
+            <p>Les informations exigées par la loi à votre arrivée (par exemple la déclaration des voyageurs à la police) sont traitées séparément lors de l'arrivée, et non via ce site.</p>`],
+            ['Vos droits', `<p>Vous pouvez demander l'accès, la rectification ou l'effacement de vos données, la limitation ou l'opposition à leur traitement et leur portabilité. Écrivez à ${mail}. Vous avez également le droit d'introduire une réclamation auprès de l'autorité italienne de protection des données, le Garante per la protezione dei dati personali (<a href="https://www.garanteprivacy.it" rel="noopener">garanteprivacy.it</a>), ou auprès de l'autorité de votre pays.</p>`],
+          ],
+          back: 'Retour au site',
+        },
+      };
+
+      function preferredLanguage() {
+        try {
+          const saved = localStorage.getItem('villa-stefano-language');
+          if (notices[saved]) return saved;
+        } catch (_) {}
+        const browserLanguages = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || ''];
+        return browserLanguages.map((code) => String(code).slice(0, 2).toLowerCase()).find((code) => notices[code]) || 'en';
+      }
+      function render(language) {
+        const notice = notices[language] || notices.en;
+        const date = new Intl.DateTimeFormat({ it: 'it-IT', en: 'en-GB', es: 'es-ES', fr: 'fr-FR' }[language] || 'en-GB', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(`${LAST_UPDATED}T12:00:00`));
+        document.documentElement.lang = language;
+        document.getElementById('language').value = language;
+        document.getElementById('content').innerHTML = `<div class="eyebrow">${notice.eyebrow}</div><h1>${notice.title}</h1><p class="updated">${notice.updated}: ${date}</p>`
+          + notice.sections.map(([heading, body]) => `<h2>${heading}</h2>${body}`).join('')
+          + `<a class="back" href="./">← ${notice.back}</a>`;
+      }
+      document.getElementById('language').addEventListener('change', (event) => {
+        try { localStorage.setItem('villa-stefano-language', event.target.value); } catch (_) {}
+        render(event.target.value);
+      });
+      render(preferredLanguage());
+    </script>
+  </body>
+</html>

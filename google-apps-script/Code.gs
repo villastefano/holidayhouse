@@ -197,15 +197,42 @@ function setup() {
   const sheetId = PropertiesService.getScriptProperties().getProperty('SHEET_ID');
   upgradeSheet_(getOrCreateSheet_());
   ScriptApp.getProjectTriggers()
-    .filter((trigger) => ['handleStatusEdit', 'syncAll'].includes(trigger.getHandlerFunction()))
+    .filter((trigger) => ['handleStatusEdit', 'syncAll', 'purgeOldEnquiries'].includes(trigger.getHandlerFunction()))
     .forEach((trigger) => ScriptApp.deleteTrigger(trigger));
   ScriptApp.newTrigger('handleStatusEdit').forSpreadsheet(sheetId).onEdit().create();
   ScriptApp.newTrigger('syncAll').timeBased().everyMinutes(10).create();
+  ScriptApp.newTrigger('purgeOldEnquiries').timeBased().everyDays(1).atHour(3).create();
   getDirectCalendar_();
   getBookedRanges_(true);
   MailApp.getRemainingDailyQuota();
   writeViewsRow_(toIsoDate_(new Date()), JSON.parse(PropertiesService.getScriptProperties().getProperty(VIEWS_PROPERTY) || '{}')[toIsoDate_(new Date())] || 0);
   syncAll();
+}
+
+/**
+ * Privacy retention (see privacy.html): enquiries that never became a
+ * booking are deleted 12 months after they arrived. Confirmed bookings and
+ * rows still holding a calendar event are kept (tax records).
+ */
+function purgeOldEnquiries() {
+  const lock = LockService.getScriptLock();
+  if (!lock.tryLock(30000)) return;
+  try {
+    const sheet = getOrCreateSheet_();
+    const cutoff = new Date();
+    cutoff.setMonth(cutoff.getMonth() - 12);
+    const lastRow = sheet.getLastRow();
+    if (lastRow < 2) return;
+    const values = sheet.getRange(2, 1, lastRow - 1, EVENT_ID_COLUMN).getValues();
+    for (let index = values.length - 1; index >= 0; index--) {
+      const received = values[index][0];
+      const status = String(values[index][STATUS_COLUMN - 1]).trim();
+      const eventId = String(values[index][EVENT_ID_COLUMN - 1] || '').trim();
+      if (received instanceof Date && received < cutoff && status !== STATUS_CONFIRMED && !eventId) sheet.deleteRow(index + 2);
+    }
+  } finally {
+    lock.releaseLock();
+  }
 }
 
 /** Adds a "Villa Stefano" menu to the Sheet for an on-demand sync. */
